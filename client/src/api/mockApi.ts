@@ -169,6 +169,38 @@ class MockApi {
       tests: this.tests.filter(t => investigation.testIds.includes(t.id))
     };
   }
+
+  async moveInvestigation(investigationId: string, newStatus: string, newIndex: number): Promise<Investigation> {
+    await delay(200);
+    const index = this.investigations.findIndex(i => i.id === investigationId);
+    if (index === -1) throw new Error('Investigation not found');
+    
+    // Map column IDs to status strings
+    const statusMap: Record<string, Investigation['status']> = {
+      'new-requests': 'New Requests',
+      'in-progress': 'In Progress',
+      'under-review': 'Under Review',
+      'approved': 'Approved',
+      'revision-required': 'Revision required'
+    };
+    
+    const status = statusMap[newStatus] || newStatus as Investigation['status'];
+    
+    this.investigations[index] = { 
+      ...this.investigations[index], 
+      status,
+      updatedAt: new Date().toISOString()
+    };
+    
+    const investigation = this.investigations[index];
+    
+    return {
+      ...investigation,
+      patient: this.patients.find(p => p.id === investigation.patientId),
+      doctor: this.doctors.find(d => d.id === investigation.doctorId),
+      tests: this.tests.filter(t => investigation.testIds.includes(t.id))
+    };
+  }
 }
 
 export const api = new MockApi();

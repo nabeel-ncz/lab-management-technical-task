@@ -272,7 +272,7 @@ export const mockInvestigations: Investigation[] = [
     updatedAt: '2024-01-20T17:00:00Z'
   },
   {
-    id: 'MHN001238',
+    id: 'MHN001240',
     patientId: 'P005',
     doctorId: 'D001',
     testIds: ['T001', 'T002'],
@@ -284,7 +284,7 @@ export const mockInvestigations: Investigation[] = [
     updatedAt: '2024-01-20T18:00:00Z'
   },
   {
-    id: 'MHN001237',
+    id: 'MHN001241',
     patientId: 'P001',
     doctorId: 'D004',
     testIds: ['T003'],
@@ -296,7 +296,7 @@ export const mockInvestigations: Investigation[] = [
     updatedAt: '2024-01-20T19:00:00Z'
   },
   {
-    id: 'MHN001238',
+    id: 'MHN001242',
     patientId: 'P002',
     doctorId: 'D005',
     testIds: ['T004'],
@@ -308,7 +308,7 @@ export const mockInvestigations: Investigation[] = [
     updatedAt: '2024-01-20T20:00:00Z'
   },
   {
-    id: 'MHN001234',
+    id: 'MHN001243',
     patientId: 'P003',
     doctorId: 'D002',
     testIds: ['T005'],
@@ -320,7 +320,7 @@ export const mockInvestigations: Investigation[] = [
     updatedAt: '2024-01-20T21:00:00Z'
   },
   {
-    id: 'MHN001234',
+    id: 'MHN001244',
     patientId: 'P004',
     doctorId: 'D003',
     testIds: ['T006'],
@@ -332,7 +332,7 @@ export const mockInvestigations: Investigation[] = [
     updatedAt: '2024-01-20T22:00:00Z'
   },
   {
-    id: 'MHN001234',
+    id: 'MHN001245',
     patientId: 'P005',
     doctorId: 'D001',
     testIds: ['T002'],
@@ -344,7 +344,7 @@ export const mockInvestigations: Investigation[] = [
     updatedAt: '2024-01-20T23:00:00Z'
   },
   {
-    id: 'MHN001236',
+    id: 'MHN001246',
     patientId: 'P001',
     doctorId: 'D004',
     testIds: ['T003'],

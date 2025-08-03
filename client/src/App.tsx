@@ -79,6 +79,27 @@ function App() {
     }
   };
 
+  const handleInvestigationMove = async (investigationId: string, newStatus: string, newIndex: number) => {
+    try {
+      const updatedInvestigation = await api.moveInvestigation(investigationId, newStatus, newIndex);
+      setInvestigations(prev => 
+        prev.map(inv => inv.id === investigationId ? updatedInvestigation : inv)
+      );
+      notification.success({
+        message: 'Investigation Moved',
+        description: 'Investigation status updated successfully',
+        duration: 2
+      });
+    } catch (error) {
+      notification.error({
+        message: 'Move Failed',
+        description: 'Failed to update investigation status'
+      });
+      // Reload investigations to reset state on error
+      loadInvestigations();
+    }
+  };
+
   const handleCreateInvestigation = async (data: InvestigationFormData) => {
     try {
       const newInvestigation = await api.createInvestigation({
@@ -255,6 +276,7 @@ function App() {
             columns={kanbanColumns}
             loading={loading}
             onCardClick={handleCardClick}
+            onInvestigationMove={handleInvestigationMove}
           />
         </Content>
       </Layout>
