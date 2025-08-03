@@ -1,12 +1,12 @@
 import React from 'react';
 import { Menu, Tooltip } from 'antd';
-import { 
-  DashboardOutlined, 
-  UserOutlined, 
-  TeamOutlined, 
+import {
+  DashboardOutlined,
+  UserOutlined,
+  TeamOutlined,
   ExperimentOutlined,
   FileTextOutlined,
-  SettingOutlined 
+  SettingOutlined
 } from '@ant-design/icons';
 
 interface SidebarProps {
@@ -18,9 +18,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
     {
       key: 'dashboard',
       icon: (
-        <Tooltip title="Dashboard" placement="right">
-          <DashboardOutlined />
-        </Tooltip>
+        <DashboardOutlined />
       ),
       label: 'Dashboard',
       disabled: true,
@@ -28,9 +26,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
     {
       key: 'investigations',
       icon: (
-        <Tooltip title="Investigations" placement="right">
-          <FileTextOutlined />
-        </Tooltip>
+        <FileTextOutlined />
       ),
       label: 'Investigations',
       disabled: false,
@@ -38,9 +34,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
     {
       key: 'patients',
       icon: (
-        <Tooltip title="Patients" placement="right">
-          <UserOutlined />
-        </Tooltip>
+        <UserOutlined />
       ),
       label: 'Patients',
       disabled: true,
@@ -48,9 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
     {
       key: 'doctors',
       icon: (
-        <Tooltip title="Doctors" placement="right">
-          <TeamOutlined />
-        </Tooltip>
+        <TeamOutlined />
       ),
       label: 'Doctors',
       disabled: true,
@@ -58,9 +50,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
     {
       key: 'tests',
       icon: (
-        <Tooltip title="Lab Tests" placement="right">
-          <ExperimentOutlined />
-        </Tooltip>
+        <ExperimentOutlined />
       ),
       label: 'Lab Tests',
       disabled: true,
@@ -68,9 +58,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
     {
       key: 'settings',
       icon: (
-        <Tooltip title="Settings" placement="right">
-          <SettingOutlined />
-        </Tooltip>
+        <SettingOutlined />
       ),
       label: 'Settings',
       disabled: true,
@@ -88,7 +76,7 @@ export const Sidebar: React.FC<SidebarProps> = () => {
           </Tooltip>
         </div>
       </div>
-      
+
       <Menu
         mode="inline"
         defaultSelectedKeys={['investigations']}
