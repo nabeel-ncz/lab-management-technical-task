@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Ant Design customizations */
+.ant-layout-sider {
+  background: #fff !important;
+}
+
+.ant-menu {
+  border-inline-end: none !important;
+}
+
+.ant-menu-item {
+  margin: 4px 8px !important;
+  border-radius: 8px !important;
+  height: 40px !important;
+  line-height: 40px !important;
+}
+
+.ant-menu-item-selected {
+  background-color: #e6f4ff !important;
+  color: #1890ff !important;
+}
+
+.ant-menu-item:hover {
+  background-color: #f0f0f0 !important;
+}
+
+.ant-card {
+  border-radius: 12px !important;
+}
+
+.ant-modal {
+  border-radius: 12px !important;
+}
+
+.ant-modal-content {
+  border-radius: 12px !important;
+}
+
+.ant-btn-primary {
+  border-radius: 8px !important;
+}
+
+.ant-input {
+  border-radius: 8px !important;
+}
+
+.ant-select-selector {
+  border-radius: 8px !important;
+}
+
+.ant-tag {
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+}
+
+/* Custom animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.investigation-card {
+  animation: slideIn 0.3s ease-out;
+}
+
+.ant-card:hover {
+  transform: translateY(-2px);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Custom gradient backgrounds */
+.gradient-bg-blue {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-bg-purple {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.gradient-bg-teal {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.gradient-bg-green {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.gradient-bg-red {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+/* Loading states */
+.ant-spin-container {
+  min-height: 200px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .ant-layout-sider {
+    position: fixed !important;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  .ant-layout-content {
+    margin-left: 0 !important;
+  }
+}
+
+/* Form styling */
+.ant-form-item-label > label {
+  font-weight: 600 !important;
+  color: #262626 !important;
+}
+
+.ant-form-item-required {
+  color: #ff4d4f !important;
+}
+
+/* Status badge styling */
+.status-badge {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 10px;
+}
+
+/* Priority badge styling */
+.priority-badge {
+  font-weight: 600;
+  border: 2px solid;
+  background: transparent;
+}
+
+/* Card hover effects */
+.investigation-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border-color: #1890ff;
+}
+
+/* Modal animations */
+.ant-modal {
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
