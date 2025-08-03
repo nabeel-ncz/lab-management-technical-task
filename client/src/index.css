@@ -199,7 +199,7 @@
   border-color: #1890ff;
 }
 
-/* Modal animations */
+/* Modal animations
 .ant-modal {
   animation: modalFadeIn 0.3s ease-out;
 }
@@ -213,4 +213,4 @@
     opacity: 1;
     transform: scale(1);
   }
-}
+} */
