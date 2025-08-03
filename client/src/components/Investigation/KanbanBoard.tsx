@@ -9,7 +9,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  closestCorners,
+  pointerWithin,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -96,26 +96,35 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
       return;
     }
 
-    // Calculate drop indicator position
+    const targetColumn = localColumns.find(col => col.id === targetColumnId);
+    if (!targetColumn) {
+      setDropIndicator(null);
+      return;
+    }
+
+    // For empty columns, always show drop indicator at index 0
     let indicatorIndex = 0;
-    if (isOverContainer) {
-      const targetColumn = localColumns.find(col => col.id === targetColumnId);
-      indicatorIndex = targetColumn ? targetColumn.investigations.length : 0;
+    
+    if (targetColumn.investigations.length === 0) {
+      // Empty column - always position at index 0
+      indicatorIndex = 0;
+    } else if (isOverContainer) {
+      // Dropped on container with cards - position at end
+      indicatorIndex = targetColumn.investigations.length;
     } else if (overData) {
-      const targetColumn = localColumns.find(col => col.id === targetColumnId);
-      if (targetColumn) {
-        indicatorIndex = targetColumn.investigations.findIndex(inv => inv.id === overId);
-        
-        // If same column, adjust for the removed item
-        if (activeData.columnId === targetColumnId) {
-          const activeIndex = targetColumn.investigations.findIndex(inv => inv.id === activeId);
-          if (activeIndex < indicatorIndex) {
-            indicatorIndex -= 1;
-          }
+      // Dropped on/near another card
+      indicatorIndex = targetColumn.investigations.findIndex(inv => inv.id === overId);
+      
+      // If same column, adjust for the removed item
+      if (activeData.columnId === targetColumnId) {
+        const activeIndex = targetColumn.investigations.findIndex(inv => inv.id === activeId);
+        if (activeIndex < indicatorIndex) {
+          indicatorIndex -= 1;
         }
       }
     }
 
+    // Always show drop indicator for valid drops
     setDropIndicator({ columnId: targetColumnId, index: indicatorIndex });
 
     // Only update columns if moving between different columns
@@ -131,7 +140,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
         sourceColumn.totalAmount = sourceColumn.investigations.reduce((sum, inv) => sum + inv.totalAmount, 0);
         newColumns[sourceColumnIndex] = sourceColumn;
 
-        // Add to target column
+        // Add to target column at the end (will be repositioned in handleDragEnd)
         const targetColumnIndex = newColumns.findIndex(col => col.id === targetColumnId);
         const targetColumn = { ...newColumns[targetColumnIndex] };
         const updatedInvestigation = {
@@ -168,27 +177,29 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     
     if (!targetColumnId) return;
 
+    const targetColumn = localColumns.find(col => col.id === targetColumnId);
+    if (!targetColumn) return;
+
     let newIndex = 0;
 
     if (isOverContainer) {
       // Dropped on empty container or at the end
-      const targetColumn = localColumns.find(col => col.id === targetColumnId);
-      newIndex = targetColumn ? targetColumn.investigations.length : 0;
+      newIndex = targetColumn.investigations.length;
     } else if (overData) {
       // Dropped on/near another card
-      const targetColumn = localColumns.find(col => col.id === targetColumnId);
-      if (targetColumn) {
-        newIndex = targetColumn.investigations.findIndex(inv => inv.id === overId);
-        
-        // If same column, adjust for the removed item
-        if (activeData.columnId === targetColumnId) {
-          const activeIndex = targetColumn.investigations.findIndex(inv => inv.id === activeId);
-          if (activeIndex < newIndex) {
-            newIndex -= 1;
-          }
+      newIndex = targetColumn.investigations.findIndex(inv => inv.id === overId);
+      
+      // If same column, adjust for the removed item
+      if (activeData.columnId === targetColumnId) {
+        const activeIndex = targetColumn.investigations.findIndex(inv => inv.id === activeId);
+        if (activeIndex < newIndex) {
+          newIndex -= 1;
         }
       }
     }
+
+    // Ensure newIndex is valid
+    newIndex = Math.max(0, Math.min(newIndex, targetColumn.investigations.length));
 
     // Update local state immediately for better UX
     if (activeData.columnId !== targetColumnId || activeId !== overId) {
@@ -207,16 +218,19 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
         // Add to target column at specific position
         const targetColumnIndex = newColumns.findIndex(col => col.id === targetColumnId);
         const targetColumn = { ...newColumns[targetColumnIndex] };
-        const updatedInvestigation = {
-          ...removedInvestigation!,
-          status: targetColumn.title as Investigation['status']
-        };
         
-        // Insert at the correct position
-        targetColumn.investigations.splice(newIndex, 0, updatedInvestigation);
-        targetColumn.count = targetColumn.investigations.length;
-        targetColumn.totalAmount = targetColumn.investigations.reduce((sum, inv) => sum + inv.totalAmount, 0);
-        newColumns[targetColumnIndex] = targetColumn;
+        if (removedInvestigation) {
+          const updatedInvestigation = {
+            ...removedInvestigation,
+            status: targetColumn.title as Investigation['status']
+          };
+          
+          // Insert at the correct position
+          targetColumn.investigations.splice(newIndex, 0, updatedInvestigation);
+          targetColumn.count = targetColumn.investigations.length;
+          targetColumn.totalAmount = targetColumn.investigations.reduce((sum, inv) => sum + inv.totalAmount, 0);
+          newColumns[targetColumnIndex] = targetColumn;
+        }
 
         return newColumns;
       });
@@ -241,7 +255,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCorners}
+      collisionDetection={pointerWithin}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
@@ -275,16 +289,32 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               </div>
 
               <div className="p-6 bg-gray-50 min-h-[200px]">
-                {column.investigations.length === 0 && !dropIndicator ? (
-                  <div className="text-center py-12">
-                    <Text className="text-gray-400 text-base">No investigations in this status</Text>
-                  </div>
-                ) : (
-                  <SortableContext 
-                    items={column.investigations.map(inv => inv.id)}
-                    strategy={horizontalListSortingStrategy}
-                  >
-                    <div className="flex gap-6 overflow-x-auto pb-4 items-start">
+                <SortableContext 
+                  items={column.investigations.map(inv => inv.id)}
+                  strategy={horizontalListSortingStrategy}
+                >
+                  {column.investigations.length === 0 ? (
+                    <div className="relative h-full min-h-[150px] w-full">
+                      {dropIndicator?.columnId === column.id ? (
+                        <div className="flex justify-center items-center h-full min-h-[150px]">
+                          <DropIndicator isVisible={true} />
+                        </div>
+                      ) : (
+                        <div 
+                          className="text-center h-full min-h-[150px] flex flex-col justify-center items-center border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors cursor-pointer"
+                          style={{
+                            // Ensure proper boundaries for each empty column
+                            margin: '0 8px',
+                            padding: '24px 16px',
+                          }}
+                        >
+                          <Text className="text-gray-400 text-base">No investigations in this status</Text>
+                          <Text className="text-gray-300 text-sm mt-2">Drop cards here to move them to this status</Text>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex gap-6 overflow-x-auto pb-4 items-start min-h-[150px]">
                       {column.investigations.map((investigation, index) => (
                         <React.Fragment key={investigation.id}>
                           {dropIndicator?.columnId === column.id && dropIndicator.index === index && (
@@ -300,8 +330,8 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         <DropIndicator isVisible={true} />
                       )}
                     </div>
-                  </SortableContext>
-                )}
+                  )}
+                </SortableContext>
               </div>
             </Card>
           </DroppableStatusContainer>
