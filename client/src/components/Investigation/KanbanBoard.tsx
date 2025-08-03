@@ -40,7 +40,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ columns, loading, onCa
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <Title level={4} className="text-white m-0 font-bold">
+                  <Title level={4} className="!text-white font-bold">
                     {column.title}
                   </Title>
                   <div className="w-8 h-8 bg-white/25 rounded-full flex items-center justify-center">
