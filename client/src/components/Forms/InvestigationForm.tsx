@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Form, Select, Button, Space, Typography, Card, Tag } from 'antd';
+import { Modal, Form, Select, Button, Typography, Card, Tag, Input } from 'antd';
 import { FileTextOutlined, UserOutlined, TeamOutlined, ExperimentOutlined } from '@ant-design/icons';
 import { InvestigationFormData, InvestigationSchema } from '../../schemas';
 import { Patient, Doctor, Test } from '../../types';
 import { api } from '../../api/mockApi';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 interface InvestigationFormProps {
   visible: boolean;
@@ -186,9 +186,9 @@ export const InvestigationForm: React.FC<InvestigationFormProps> = ({
         </Form.Item>
 
         <Form.Item label="Additional Notes" name="notes">
-          <Select.TextArea 
-            rows={3} 
-            placeholder="Any additional notes or special instructions..." 
+          <Input.TextArea
+            rows={3}
+            placeholder="Any additional notes or special instructions..."
           />
         </Form.Item>
 

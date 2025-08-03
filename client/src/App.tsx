@@ -21,7 +21,7 @@ function App() {
   const [investigations, setInvestigations] = useState<Investigation[]>([]);
   const [filteredInvestigations, setFilteredInvestigations] = useState<Investigation[]>([]);
   const [loading, setLoading] = useState(false);
-  
+
   // Modal states
   const [investigationModalVisible, setInvestigationModalVisible] = useState(false);
   const [selectedInvestigation, setSelectedInvestigation] = useState<Investigation | null>(null);
@@ -45,7 +45,7 @@ function App() {
     try {
       const data = await api.getInvestigations();
       setInvestigations(data);
-    } catch  {
+    } catch {
       notification.error({
         message: 'Error',
         description: 'Failed to load investigations'
@@ -63,7 +63,7 @@ function App() {
   const handleInvestigationUpdate = async (id: string, updates: Partial<Investigation>) => {
     try {
       const updatedInvestigation = await api.updateInvestigation(id, updates);
-      setInvestigations(prev => 
+      setInvestigations(prev =>
         prev.map(inv => inv.id === id ? updatedInvestigation : inv)
       );
       setInvestigationModalVisible(false);
@@ -71,7 +71,7 @@ function App() {
         message: 'Success',
         description: 'Investigation updated successfully'
       });
-    } catch  {
+    } catch {
       notification.error({
         message: 'Error',
         description: 'Failed to update investigation'
@@ -82,7 +82,7 @@ function App() {
   const handleInvestigationMove = async (investigationId: string, newStatus: string, newIndex: number) => {
     try {
       const updatedInvestigation = await api.moveInvestigation(investigationId, newStatus, newIndex);
-      setInvestigations(prev => 
+      setInvestigations(prev =>
         prev.map(inv => inv.id === investigationId ? updatedInvestigation : inv)
       );
       notification.success({
@@ -90,7 +90,7 @@ function App() {
         description: 'Investigation status updated successfully',
         duration: 2
       });
-    } catch (error) {
+    } catch {
       notification.error({
         message: 'Move Failed',
         description: 'Failed to update investigation status'
@@ -113,7 +113,7 @@ function App() {
         message: 'Success',
         description: 'Investigation created successfully'
       });
-    } catch  {
+    } catch {
       notification.error({
         message: 'Error',
         description: 'Failed to create investigation'
@@ -129,7 +129,7 @@ function App() {
         message: 'Success',
         description: 'Patient added successfully'
       });
-    } catch  {
+    } catch {
       notification.error({
         message: 'Error',
         description: 'Failed to add patient'
@@ -145,7 +145,7 @@ function App() {
         message: 'Success',
         description: 'Doctor added successfully'
       });
-    } catch  {
+    } catch {
       notification.error({
         message: 'Error',
         description: 'Failed to add doctor'
@@ -161,7 +161,7 @@ function App() {
         message: 'Success',
         description: 'Test added successfully'
       });
-    } catch  {
+    } catch {
       notification.error({
         message: 'Error',
         description: 'Failed to add test'
@@ -233,7 +233,7 @@ function App() {
       const statusInvestigations = filteredInvestigations
         .filter(inv => inv.status === config.title)
         .sort((a, b) => a.order - b.order); // Sort by order field
-      
+
       return {
         ...config,
         investigations: statusInvestigations,
@@ -247,22 +247,22 @@ function App() {
 
   return (
     <Layout className="min-h-screen bg-gray-50">
-      <Sider 
-        trigger={null} 
-        collapsible 
+      <Sider
+        trigger={null}
+        collapsible
         collapsed={collapsed}
         className="!bg-white shadow-lg z-10"
       >
         <Sidebar collapsed={collapsed} />
       </Sider>
-      
+
       <Layout>
-        <Header 
+        <Header
           collapsed={collapsed}
           onToggleCollapse={() => setCollapsed(true)}
           onNewInvestigation={() => setInvestigationFormVisible(true)}
         />
-        
+
         <Content className="p-6">
           <FilterBar
             onDateRangeChange={handleDateRangeChange}
@@ -271,7 +271,7 @@ function App() {
             onSearch={handleSearch}
             onRefresh={loadInvestigations}
           />
-          
+
           <KanbanBoard
             columns={kanbanColumns}
             loading={loading}
