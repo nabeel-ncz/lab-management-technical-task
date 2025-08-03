@@ -19,6 +19,7 @@ import { Investigation, KanbanColumn } from '../../types';
 import { InvestigationCard } from './InvestigationCard';
 import { DroppableStatusContainer } from './DroppableStatusContainer';
 import { DraggableInvestigationCard } from './DraggableInvestigationCard';
+import { DropIndicator } from './DropIndicator';
 
 const { Title, Text } = Typography;
 
@@ -37,6 +38,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
 }) => {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localColumns, setLocalColumns] = useState<KanbanColumn[]>(columns);
+  const [dropIndicator, setDropIndicator] = useState<{columnId: string, index: number} | null>(null);
 
   // Update local state when props change
   useEffect(() => {
@@ -67,11 +69,15 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
+    setDropIndicator(null);
   };
 
   const handleDragOver = (event: DragOverEvent) => {
     const { active, over } = event;
-    if (!over) return;
+    if (!over) {
+      setDropIndicator(null);
+      return;
+    }
 
     const activeId = active.id as string;
     const overId = over.id as string;
@@ -85,39 +91,67 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     const overData = isOverContainer ? null : findInvestigation(overId);
     
     const targetColumnId = isOverContainer ? overId : overData?.columnId;
-    if (!targetColumnId || activeData.columnId === targetColumnId) return;
+    if (!targetColumnId) {
+      setDropIndicator(null);
+      return;
+    }
 
-    // Move item between different columns
-    setLocalColumns(prevColumns => {
-      const newColumns = [...prevColumns];
-      
-      // Remove from source column
-      const sourceColumnIndex = newColumns.findIndex(col => col.id === activeData.columnId);
-      const sourceColumn = { ...newColumns[sourceColumnIndex] };
-      sourceColumn.investigations = sourceColumn.investigations.filter(inv => inv.id !== activeId);
-      sourceColumn.count = sourceColumn.investigations.length;
-      sourceColumn.totalAmount = sourceColumn.investigations.reduce((sum, inv) => sum + inv.totalAmount, 0);
-      newColumns[sourceColumnIndex] = sourceColumn;
+    // Calculate drop indicator position
+    let indicatorIndex = 0;
+    if (isOverContainer) {
+      const targetColumn = localColumns.find(col => col.id === targetColumnId);
+      indicatorIndex = targetColumn ? targetColumn.investigations.length : 0;
+    } else if (overData) {
+      const targetColumn = localColumns.find(col => col.id === targetColumnId);
+      if (targetColumn) {
+        indicatorIndex = targetColumn.investigations.findIndex(inv => inv.id === overId);
+        
+        // If same column, adjust for the removed item
+        if (activeData.columnId === targetColumnId) {
+          const activeIndex = targetColumn.investigations.findIndex(inv => inv.id === activeId);
+          if (activeIndex < indicatorIndex) {
+            indicatorIndex -= 1;
+          }
+        }
+      }
+    }
 
-      // Add to target column
-      const targetColumnIndex = newColumns.findIndex(col => col.id === targetColumnId);
-      const targetColumn = { ...newColumns[targetColumnIndex] };
-      const updatedInvestigation = {
-        ...activeData.investigation,
-        status: targetColumn.title as Investigation['status']
-      };
-      targetColumn.investigations = [...targetColumn.investigations, updatedInvestigation];
-      targetColumn.count = targetColumn.investigations.length;
-      targetColumn.totalAmount = targetColumn.investigations.reduce((sum, inv) => sum + inv.totalAmount, 0);
-      newColumns[targetColumnIndex] = targetColumn;
+    setDropIndicator({ columnId: targetColumnId, index: indicatorIndex });
 
-      return newColumns;
-    });
+    // Only update columns if moving between different columns
+    if (activeData.columnId !== targetColumnId) {
+      setLocalColumns(prevColumns => {
+        const newColumns = [...prevColumns];
+        
+        // Remove from source column
+        const sourceColumnIndex = newColumns.findIndex(col => col.id === activeData.columnId);
+        const sourceColumn = { ...newColumns[sourceColumnIndex] };
+        sourceColumn.investigations = sourceColumn.investigations.filter(inv => inv.id !== activeId);
+        sourceColumn.count = sourceColumn.investigations.length;
+        sourceColumn.totalAmount = sourceColumn.investigations.reduce((sum, inv) => sum + inv.totalAmount, 0);
+        newColumns[sourceColumnIndex] = sourceColumn;
+
+        // Add to target column
+        const targetColumnIndex = newColumns.findIndex(col => col.id === targetColumnId);
+        const targetColumn = { ...newColumns[targetColumnIndex] };
+        const updatedInvestigation = {
+          ...activeData.investigation,
+          status: targetColumn.title as Investigation['status']
+        };
+        targetColumn.investigations = [...targetColumn.investigations, updatedInvestigation];
+        targetColumn.count = targetColumn.investigations.length;
+        targetColumn.totalAmount = targetColumn.investigations.reduce((sum, inv) => sum + inv.totalAmount, 0);
+        newColumns[targetColumnIndex] = targetColumn;
+
+        return newColumns;
+      });
+    }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
+    setDropIndicator(null);
 
     if (!over) return;
 
@@ -127,41 +161,70 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     const activeData = findInvestigation(activeId);
     if (!activeData) return;
 
-    // Handle reordering within the same column
-    if (activeId !== overId) {
-      const isOverContainer = localColumns.some(column => column.id === overId);
-      const overData = isOverContainer ? null : findInvestigation(overId);
-      
-      if (overData && activeData.columnId === overData.columnId) {
-        // Reorder within the same column
-        setLocalColumns(prevColumns => {
-          const newColumns = [...prevColumns];
-          const columnIndex = newColumns.findIndex(col => col.id === activeData.columnId);
-          const column = { ...newColumns[columnIndex] };
-          
-          const oldIndex = column.investigations.findIndex(inv => inv.id === activeId);
-          const newIndex = column.investigations.findIndex(inv => inv.id === overId);
-          
-          const reorderedInvestigations = [...column.investigations];
-          reorderedInvestigations.splice(oldIndex, 1);
-          reorderedInvestigations.splice(newIndex, 0, activeData.investigation);
-          
-          column.investigations = reorderedInvestigations;
-          newColumns[columnIndex] = column;
-          
-          return newColumns;
-        });
+    // Determine target column and position
+    const isOverContainer = localColumns.some(column => column.id === overId);
+    const overData = isOverContainer ? null : findInvestigation(overId);
+    const targetColumnId = isOverContainer ? overId : overData?.columnId;
+    
+    if (!targetColumnId) return;
+
+    let newIndex = 0;
+
+    if (isOverContainer) {
+      // Dropped on empty container or at the end
+      const targetColumn = localColumns.find(col => col.id === targetColumnId);
+      newIndex = targetColumn ? targetColumn.investigations.length : 0;
+    } else if (overData) {
+      // Dropped on/near another card
+      const targetColumn = localColumns.find(col => col.id === targetColumnId);
+      if (targetColumn) {
+        newIndex = targetColumn.investigations.findIndex(inv => inv.id === overId);
+        
+        // If same column, adjust for the removed item
+        if (activeData.columnId === targetColumnId) {
+          const activeIndex = targetColumn.investigations.findIndex(inv => inv.id === activeId);
+          if (activeIndex < newIndex) {
+            newIndex -= 1;
+          }
+        }
       }
     }
 
-    // Call the parent callback if provided
+    // Update local state immediately for better UX
+    if (activeData.columnId !== targetColumnId || activeId !== overId) {
+      setLocalColumns(prevColumns => {
+        const newColumns = [...prevColumns];
+        
+        // Remove from source column
+        const sourceColumnIndex = newColumns.findIndex(col => col.id === activeData.columnId);
+        const sourceColumn = { ...newColumns[sourceColumnIndex] };
+        const removedInvestigation = sourceColumn.investigations.find(inv => inv.id === activeId);
+        sourceColumn.investigations = sourceColumn.investigations.filter(inv => inv.id !== activeId);
+        sourceColumn.count = sourceColumn.investigations.length;
+        sourceColumn.totalAmount = sourceColumn.investigations.reduce((sum, inv) => sum + inv.totalAmount, 0);
+        newColumns[sourceColumnIndex] = sourceColumn;
+
+        // Add to target column at specific position
+        const targetColumnIndex = newColumns.findIndex(col => col.id === targetColumnId);
+        const targetColumn = { ...newColumns[targetColumnIndex] };
+        const updatedInvestigation = {
+          ...removedInvestigation!,
+          status: targetColumn.title as Investigation['status']
+        };
+        
+        // Insert at the correct position
+        targetColumn.investigations.splice(newIndex, 0, updatedInvestigation);
+        targetColumn.count = targetColumn.investigations.length;
+        targetColumn.totalAmount = targetColumn.investigations.reduce((sum, inv) => sum + inv.totalAmount, 0);
+        newColumns[targetColumnIndex] = targetColumn;
+
+        return newColumns;
+      });
+    }
+
+    // Call the parent callback for API update
     if (onInvestigationMove) {
-      const finalData = findInvestigation(activeId);
-      if (finalData) {
-        const newIndex = finalData.investigation ? 
-          localColumns.find(col => col.id === finalData.columnId)?.investigations.findIndex(inv => inv.id === activeId) || 0 : 0;
-        onInvestigationMove(activeId, finalData.columnId, newIndex);
-      }
+      onInvestigationMove(activeId, targetColumnId, newIndex);
     }
   };
 
@@ -212,7 +275,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               </div>
 
               <div className="p-6 bg-gray-50 min-h-[200px]">
-                {column.investigations.length === 0 ? (
+                {column.investigations.length === 0 && !dropIndicator ? (
                   <div className="text-center py-12">
                     <Text className="text-gray-400 text-base">No investigations in this status</Text>
                   </div>
@@ -221,14 +284,21 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     items={column.investigations.map(inv => inv.id)}
                     strategy={horizontalListSortingStrategy}
                   >
-                    <div className="flex gap-6 overflow-x-auto pb-4">
-                      {column.investigations.map((investigation) => (
-                        <DraggableInvestigationCard
-                          key={investigation.id}
-                          investigation={investigation}
-                          onClick={onCardClick}
-                        />
+                    <div className="flex gap-6 overflow-x-auto pb-4 items-start">
+                      {column.investigations.map((investigation, index) => (
+                        <React.Fragment key={investigation.id}>
+                          {dropIndicator?.columnId === column.id && dropIndicator.index === index && (
+                            <DropIndicator isVisible={true} />
+                          )}
+                          <DraggableInvestigationCard
+                            investigation={investigation}
+                            onClick={onCardClick}
+                          />
+                        </React.Fragment>
                       ))}
+                      {dropIndicator?.columnId === column.id && dropIndicator.index === column.investigations.length && (
+                        <DropIndicator isVisible={true} />
+                      )}
                     </div>
                   </SortableContext>
                 )}
@@ -240,7 +310,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
       <DragOverlay>
         {activeInvestigation ? (
-          <div className="rotate-3 opacity-95">
+          <div className="rotate-3 opacity-95 scale-105">
             <InvestigationCard
               investigation={activeInvestigation}
               onClick={() => {}}

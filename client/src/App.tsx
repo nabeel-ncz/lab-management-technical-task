@@ -230,9 +230,9 @@ function App() {
     ];
 
     return statusConfig.map(config => {
-      const statusInvestigations = filteredInvestigations.filter(
-        inv => inv.status === config.title
-      );
+      const statusInvestigations = filteredInvestigations
+        .filter(inv => inv.status === config.title)
+        .sort((a, b) => a.order - b.order); // Sort by order field
       
       return {
         ...config,

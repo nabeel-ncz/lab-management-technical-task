@@ -125,16 +125,23 @@ class MockApi {
     };
   }
 
-  async createInvestigation(investigation: Omit<Investigation, 'id' | 'createdAt' | 'updatedAt' | 'totalAmount'>): Promise<Investigation> {
+  async createInvestigation(investigation: Omit<Investigation, 'id' | 'createdAt' | 'updatedAt' | 'totalAmount' | 'order'>): Promise<Investigation> {
     await delay(500);
     
     const tests = this.tests.filter(t => investigation.testIds.includes(t.id));
     const totalAmount = tests.reduce((sum, test) => sum + test.price, 0);
     
+    // Calculate next order for the status
+    const existingInvestigationsInStatus = this.investigations.filter(inv => inv.status === investigation.status);
+    const maxOrder = existingInvestigationsInStatus.length > 0 
+      ? Math.max(...existingInvestigationsInStatus.map(inv => inv.order || 0))
+      : 0;
+    
     const newInvestigation: Investigation = {
       ...investigation,
       id: `MHN${String(this.investigations.length + 1000).padStart(6, '0')}`,
       totalAmount,
+      order: maxOrder + 1,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -185,12 +192,59 @@ class MockApi {
     };
     
     const status = statusMap[newStatus] || newStatus as Investigation['status'];
+    const currentInvestigation = this.investigations[index];
+    const oldStatus = currentInvestigation.status;
     
+    // Get all investigations in the target status
+    const targetStatusInvestigations = this.investigations
+      .filter(inv => inv.id !== investigationId && inv.status === status)
+      .sort((a, b) => a.order - b.order);
+    
+    // Calculate new order based on position
+    let newOrder: number;
+    
+    if (targetStatusInvestigations.length === 0) {
+      // First item in the status
+      newOrder = 1;
+    } else if (newIndex === 0) {
+      // Insert at the beginning
+      newOrder = targetStatusInvestigations[0].order - 1;
+    } else if (newIndex >= targetStatusInvestigations.length) {
+      // Insert at the end
+      newOrder = targetStatusInvestigations[targetStatusInvestigations.length - 1].order + 1;
+    } else {
+      // Insert between two items
+      const prevOrder = targetStatusInvestigations[newIndex - 1].order;
+      const nextOrder = targetStatusInvestigations[newIndex].order;
+      newOrder = (prevOrder + nextOrder) / 2;
+    }
+    
+    // Update the moved investigation
     this.investigations[index] = { 
       ...this.investigations[index], 
       status,
+      order: newOrder,
       updatedAt: new Date().toISOString()
     };
+    
+    // If status changed, reorder investigations in the old status
+    if (oldStatus !== status) {
+      const oldStatusInvestigations = this.investigations
+        .filter(inv => inv.status === oldStatus)
+        .sort((a, b) => a.order - b.order);
+      
+      // Reassign order values sequentially for the old status
+      oldStatusInvestigations.forEach((inv, idx) => {
+        const invIndex = this.investigations.findIndex(i => i.id === inv.id);
+        if (invIndex !== -1) {
+          this.investigations[invIndex] = {
+            ...this.investigations[invIndex],
+            order: idx + 1,
+            updatedAt: new Date().toISOString()
+          };
+        }
+      });
+    }
     
     const investigation = this.investigations[index];
     

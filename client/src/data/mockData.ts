@@ -175,6 +175,7 @@ export const mockTests: Test[] = [
 ];
 
 export const mockInvestigations: Investigation[] = [
+  // New Requests - order 1-4
   {
     id: 'MHN001236',
     patientId: 'P001',
@@ -184,6 +185,7 @@ export const mockInvestigations: Investigation[] = [
     priority: 'Normal',
     totalAmount: 1200,
     notes: 'Routine thyroid check-up',
+    order: 1,
     createdAt: '2024-01-20T10:30:00Z',
     updatedAt: '2024-01-20T10:30:00Z'
   },
@@ -196,6 +198,7 @@ export const mockInvestigations: Investigation[] = [
     priority: 'Normal',
     totalAmount: 800,
     notes: 'Follow-up liver function assessment',
+    order: 2,
     createdAt: '2024-01-20T11:45:00Z',
     updatedAt: '2024-01-20T11:45:00Z'
   },
@@ -208,6 +211,7 @@ export const mockInvestigations: Investigation[] = [
     priority: 'Emergency',
     totalAmount: 600,
     notes: 'Urgent kidney function check',
+    order: 3,
     createdAt: '2024-01-20T12:15:00Z',
     updatedAt: '2024-01-20T12:15:00Z'
   },
@@ -220,9 +224,11 @@ export const mockInvestigations: Investigation[] = [
     priority: 'Normal',
     totalAmount: 1200,
     notes: 'Complete health check-up',
+    order: 4,
     createdAt: '2024-01-20T13:30:00Z',
     updatedAt: '2024-01-20T13:30:00Z'
   },
+  // In Progress - order 1-4
   {
     id: 'MHN001237',
     patientId: 'P001',
@@ -232,6 +238,7 @@ export const mockInvestigations: Investigation[] = [
     priority: 'Emergency',
     totalAmount: 500,
     notes: 'Blood work in progress',
+    order: 1,
     createdAt: '2024-01-19T09:00:00Z',
     updatedAt: '2024-01-20T14:00:00Z'
   },
@@ -244,6 +251,7 @@ export const mockInvestigations: Investigation[] = [
     priority: 'Normal',
     totalAmount: 700,
     notes: 'Lipid profile analysis',
+    order: 2,
     createdAt: '2024-01-19T10:30:00Z',
     updatedAt: '2024-01-20T15:30:00Z'
   },
@@ -256,6 +264,7 @@ export const mockInvestigations: Investigation[] = [
     priority: 'High',
     totalAmount: 300,
     notes: 'Diabetes monitoring',
+    order: 3,
     createdAt: '2024-01-19T11:15:00Z',
     updatedAt: '2024-01-20T16:15:00Z'
   },
@@ -268,9 +277,11 @@ export const mockInvestigations: Investigation[] = [
     priority: 'Normal',
     totalAmount: 900,
     notes: 'Kidney and glucose assessment',
+    order: 4,
     createdAt: '2024-01-19T12:00:00Z',
     updatedAt: '2024-01-20T17:00:00Z'
   },
+  // Under Review - order 1-3
   {
     id: 'MHN001240',
     patientId: 'P005',
@@ -280,6 +291,7 @@ export const mockInvestigations: Investigation[] = [
     priority: 'High',
     totalAmount: 2000,
     notes: 'Comprehensive endocrine panel',
+    order: 1,
     createdAt: '2024-01-18T08:30:00Z',
     updatedAt: '2024-01-20T18:00:00Z'
   },
@@ -292,6 +304,7 @@ export const mockInvestigations: Investigation[] = [
     priority: 'Normal',
     totalAmount: 500,
     notes: 'CBC review pending',
+    order: 2,
     createdAt: '2024-01-18T09:45:00Z',
     updatedAt: '2024-01-20T19:00:00Z'
   },
@@ -304,9 +317,11 @@ export const mockInvestigations: Investigation[] = [
     priority: 'Normal',
     totalAmount: 600,
     notes: 'Kidney function review',
+    order: 3,
     createdAt: '2024-01-18T10:20:00Z',
     updatedAt: '2024-01-20T20:00:00Z'
   },
+  // Approved - order 1-2
   {
     id: 'MHN001243',
     patientId: 'P003',
@@ -316,6 +331,7 @@ export const mockInvestigations: Investigation[] = [
     priority: 'Normal',
     totalAmount: 700,
     notes: 'Lipid profile approved',
+    order: 1,
     createdAt: '2024-01-17T11:30:00Z',
     updatedAt: '2024-01-20T21:00:00Z'
   },
@@ -328,9 +344,11 @@ export const mockInvestigations: Investigation[] = [
     priority: 'Normal',
     totalAmount: 300,
     notes: 'Blood sugar test completed',
+    order: 2,
     createdAt: '2024-01-17T12:15:00Z',
     updatedAt: '2024-01-20T22:00:00Z'
   },
+  // Revision required - order 1-2
   {
     id: 'MHN001245',
     patientId: 'P005',
@@ -340,6 +358,7 @@ export const mockInvestigations: Investigation[] = [
     priority: 'High',
     totalAmount: 800,
     notes: 'Liver function needs retest',
+    order: 1,
     createdAt: '2024-01-16T13:00:00Z',
     updatedAt: '2024-01-20T23:00:00Z'
   },
@@ -352,6 +371,7 @@ export const mockInvestigations: Investigation[] = [
     priority: 'Normal',
     totalAmount: 500,
     notes: 'Sample quality issues',
+    order: 2,
     createdAt: '2024-01-16T14:30:00Z',
     updatedAt: '2024-01-20T23:30:00Z'
   }

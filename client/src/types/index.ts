@@ -42,6 +42,7 @@ export interface Investigation {
   totalAmount: number;
   reportFile?: string;
   notes: string;
+  order: number; // For ordering within status columns
   createdAt: string;
   updatedAt: string;
   patient?: Patient;
