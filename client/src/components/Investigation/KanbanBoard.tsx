@@ -25,43 +25,48 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ columns, loading, onCa
   }
 
   return (
-    <div className="flex gap-6 overflow-x-auto pb-6">
+    <div className="space-y-6">
       {columns.map((column) => (
-        <div key={column.id} className="flex-shrink-0 w-80">
+        <div key={column.id} className="w-full">
           <Card 
-            className="h-full"
+            className="w-full"
             style={{ backgroundColor: column.bgColor }}
             bodyStyle={{ padding: 0 }}
           >
-            {/* Column Header */}
+            {/* Row Header */}
             <div className="p-4 border-b border-white/20">
-              <div className="flex items-center justify-between mb-2">
-                <Title level={5} className="text-white m-0 font-semibold">
-                  {column.title}
-                </Title>
-                <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-                  <Text className="text-white text-xs font-bold">{column.count}</Text>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <Title level={5} className="text-white m-0 font-semibold">
+                    {column.title}
+                  </Title>
+                  <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                    <Text className="text-white text-xs font-bold">{column.count}</Text>
+                  </div>
                 </div>
+                <Text className="text-white/80 text-sm">
+                  Amount to be billed: {formatCurrency(column.totalAmount)}
+                </Text>
               </div>
-              <Text className="text-white/80 text-sm">
-                Amount to be billed: {formatCurrency(column.totalAmount)}
-              </Text>
             </div>
 
-            {/* Column Body */}
-            <div className="p-4 max-h-96 overflow-y-auto">
+            {/* Row Body - Horizontal Cards */}
+            <div className="p-4">
               {column.investigations.length === 0 ? (
                 <div className="text-center py-8">
                   <Text className="text-white/60">No investigations</Text>
                 </div>
               ) : (
-                column.investigations.map((investigation) => (
-                  <InvestigationCard
-                    key={investigation.id}
-                    investigation={investigation}
-                    onClick={onCardClick}
-                  />
-                ))
+                <div className="flex gap-4 overflow-x-auto pb-2">
+                  {column.investigations.map((investigation) => (
+                    <div key={investigation.id} className="flex-shrink-0">
+                      <InvestigationCard
+                        investigation={investigation}
+                        onClick={onCardClick}
+                      />
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </Card>
