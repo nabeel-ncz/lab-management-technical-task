@@ -68,6 +68,7 @@ const InvestigationSchema = new Schema<IInvestigation>(
   {
     timestamps: true,
     toJSON: {
+      virtuals: true,
       transform: function (doc, ret) {
         ret.id = (ret._id as mongoose.Types.ObjectId).toString();
         if (ret._id !== undefined) delete ret._id;
@@ -88,6 +89,7 @@ const InvestigationSchema = new Schema<IInvestigation>(
       },
     },
     toObject: {
+      virtuals: true,
       transform: function (doc, ret) {
         ret.id = (ret._id as mongoose.Types.ObjectId).toString();
         if (ret._id !== undefined) delete ret._id;
@@ -124,6 +126,30 @@ InvestigationSchema.index({
   priority: 1,
   createdAt: -1,
 });
+
+// Virtual fields for populated data
+InvestigationSchema.virtual('patient', {
+  ref: 'Patient',
+  localField: 'patientId',
+  foreignField: '_id',
+  justOne: true
+});
+
+InvestigationSchema.virtual('doctor', {
+  ref: 'Doctor',
+  localField: 'doctorId',
+  foreignField: '_id',
+  justOne: true
+});
+
+InvestigationSchema.virtual('tests', {
+  ref: 'Test',
+  localField: 'testIds',
+  foreignField: '_id',
+  justOne: false
+});
+
+
 
 // Pre-save middleware to auto-calculate total amount
 InvestigationSchema.pre("save", async function (next) {
