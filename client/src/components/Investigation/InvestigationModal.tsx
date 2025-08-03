@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Form, Select, Upload, Button, Input, Space, Tag, Typography, Divider } from 'antd';
 import { UploadOutlined, UserOutlined, TeamOutlined, CalendarOutlined, FileTextOutlined } from '@ant-design/icons';
 import { Investigation } from '../../types';
@@ -16,6 +16,7 @@ interface InvestigationModalProps {
 
 interface FormValues {
   status: 'Advised' | 'Billing' | 'New Investigations' | 'In Progress' | 'Under Review' | 'Approved' | 'Revision Required';
+  priority: 'Emergency' | 'Normal' | 'High';
   notes: string;
   reportFile: FileList | null;
 }
@@ -29,6 +30,16 @@ export const InvestigationModal: React.FC<InvestigationModalProps> = ({
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (investigation) {
+      form.setFieldsValue({
+        status: investigation.status,
+        priority: investigation.priority,
+        notes: investigation.notes
+      });
+    }
+  }, [investigation, form]);
+
   const handleSubmit = async (values: FormValues) => {
     if (!investigation) {
       return;
@@ -37,6 +48,7 @@ export const InvestigationModal: React.FC<InvestigationModalProps> = ({
     try {
       await onUpdate(investigation.id, {
         status: values.status,
+        priority: values.priority,
         notes: values.notes,
         reportFile: values?.reportFile?.[0]?.name
       });
@@ -56,6 +68,12 @@ export const InvestigationModal: React.FC<InvestigationModalProps> = ({
     { label: 'Under Review', value: 'Under Review' },
     { label: 'Approved', value: 'Approved' },
     { label: 'Revision Required', value: 'Revision Required' },
+  ];
+
+  const priorityOptions = [
+    { label: 'Emergency', value: 'Emergency' },
+    { label: 'High', value: 'High' },
+    { label: 'Normal', value: 'Normal' },
   ];
 
   const getStatusColor = (status: string) => {
@@ -217,16 +235,25 @@ export const InvestigationModal: React.FC<InvestigationModalProps> = ({
             onFinish={handleSubmit}
             initialValues={{
               status: investigation.status,
+              priority: investigation.priority,
               notes: investigation.notes
             }}
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Form.Item
                 label="Status"
                 name="status"
                 rules={[{ required: true, message: 'Please select a status' }]}
               >
                 <Select options={statusOptions} placeholder="Select status" />
+              </Form.Item>
+
+              <Form.Item
+                label="Priority"
+                name="priority"
+                rules={[{ required: true, message: 'Please select a priority' }]}
+              >
+                <Select options={priorityOptions} placeholder="Select priority" />
               </Form.Item>
 
               <Form.Item label="Upload Report" name="reportFile">
