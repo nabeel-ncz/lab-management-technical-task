@@ -29,35 +29,38 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ columns, loading, onCa
       {columns.map((column) => (
         <div key={column.id} className="w-full">
           <Card 
-            className="w-full"
-            style={{ backgroundColor: column.bgColor }}
+            className="w-full border border-gray-200 rounded-xl shadow-sm"
+            style={{ backgroundColor: 'white' }}
             bodyStyle={{ padding: 0 }}
           >
-            {/* Row Header */}
-            <div className="p-4 border-b border-white/20">
+            {/* Row Header with Status Color */}
+            <div 
+              className="p-6 rounded-t-xl"
+              style={{ backgroundColor: column.bgColor }}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <Title level={5} className="text-white m-0 font-semibold">
+                  <Title level={4} className="text-white m-0 font-bold">
                     {column.title}
                   </Title>
-                  <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-                    <Text className="text-white text-xs font-bold">{column.count}</Text>
+                  <div className="w-8 h-8 bg-white/25 rounded-full flex items-center justify-center">
+                    <Text className="text-white text-sm font-bold">{column.count}</Text>
                   </div>
                 </div>
-                <Text className="text-white/80 text-sm">
+                <Text className="text-white text-base font-medium">
                   Amount to be billed: {formatCurrency(column.totalAmount)}
                 </Text>
               </div>
             </div>
 
-            {/* Row Body - Horizontal Cards */}
-            <div className="p-4">
+            {/* Row Body - Horizontal Cards with White Background */}
+            <div className="p-6 bg-gray-50">
               {column.investigations.length === 0 ? (
-                <div className="text-center py-8">
-                  <Text className="text-white/60">No investigations</Text>
+                <div className="text-center py-12">
+                  <Text className="text-gray-400 text-base">No investigations in this status</Text>
                 </div>
               ) : (
-                <div className="flex gap-4 overflow-x-auto pb-2">
+                <div className="flex gap-6 overflow-x-auto pb-4">
                   {column.investigations.map((investigation) => (
                     <div key={investigation.id} className="flex-shrink-0">
                       <InvestigationCard

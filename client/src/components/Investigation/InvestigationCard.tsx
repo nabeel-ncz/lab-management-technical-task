@@ -14,8 +14,18 @@ interface InvestigationCardProps {
 export const InvestigationCard: React.FC<InvestigationCardProps> = ({ investigation, onClick }) => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
+      case 'Emergency': return '#dc2626'; // red-600
+      case 'High': return '#ea580c'; // orange-600
+      case 'Normal': return '#16a34a'; // green-600
+      default: return '#2563eb'; // blue-600
+    }
+  };
+
+  const getPriorityTagColor = (priority: string) => {
+    switch (priority) {
       case 'Emergency': return 'red';
       case 'High': return 'orange';
+      case 'Normal': return 'green';
       default: return 'blue';
     }
   };
@@ -37,36 +47,56 @@ export const InvestigationCard: React.FC<InvestigationCardProps> = ({ investigat
 
   return (
     <Card 
-      className="mb-4 cursor-pointer hover:shadow-md transition-all duration-200 border border-gray-200 rounded-lg"
+      className="cursor-pointer hover:shadow-lg transition-all duration-200 rounded-xl"
       onClick={() => onClick(investigation)}
       size="small"
+      style={{
+        width: '280px',
+        height: '320px',
+        borderLeft: `4px solid ${getPriorityColor(investigation.priority)}`,
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+        borderRadius: '12px',
+      }}
+      bodyStyle={{
+        padding: '20px',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
     >
-      <div className="space-y-3">
+      <div className="flex flex-col h-full space-y-4">
         {/* Header with ID and Priority */}
         <div className="flex items-center justify-between">
-          <Text className="font-semibold text-gray-900">{investigation.id}</Text>
-          <Tag color={getPriorityColor(investigation.priority)} className="px-2 py-1 text-xs">
+          <Text className="font-bold text-gray-900 text-sm">{investigation.id}</Text>
+          <Tag 
+            color={getPriorityTagColor(investigation.priority)} 
+            className="px-3 py-1 text-xs font-medium rounded-lg"
+          >
             {investigation.priority}
           </Tag>
         </div>
 
         {/* Test Name */}
-        <div>
-          <Text className="font-medium text-gray-800 text-sm">
+        <div className="flex-shrink-0">
+          <Text className="font-semibold text-gray-800 text-sm line-clamp-2">
             {investigation.tests?.[0]?.name || 'Test Name'}
           </Text>
           {investigation.tests && investigation.tests.length > 1 && (
-            <Text className="text-gray-500 text-xs ml-1">
-              +{investigation.tests.length - 1} more
+            <Text className="text-gray-500 text-xs mt-1">
+              +{investigation.tests.length - 1} more tests
             </Text>
           )}
         </div>
 
         {/* Patient Info */}
-        <div className="flex items-center space-x-2">
-          <Avatar size="small" icon={<UserOutlined />} className="bg-blue-100 text-blue-600" />
+        <div className="flex items-center space-x-3">
+          <Avatar 
+            size={32} 
+            icon={<UserOutlined />} 
+            className="bg-blue-50 text-blue-600 border border-blue-200" 
+          />
           <div className="flex-1 min-w-0">
-            <Text className="text-xs font-medium text-gray-700 block truncate">
+            <Text className="text-sm font-medium text-gray-700 block truncate">
               {investigation.patient?.name || 'Patient Name'}
             </Text>
             <Text className="text-xs text-gray-500">
@@ -76,36 +106,43 @@ export const InvestigationCard: React.FC<InvestigationCardProps> = ({ investigat
         </div>
 
         {/* Doctor Info */}
-        <div className="flex items-center space-x-2">
-          <Avatar size="small" icon={<TeamOutlined />} className="bg-green-100 text-green-600" />
+        <div className="flex items-center space-x-3">
+          <Avatar 
+            size={32} 
+            icon={<TeamOutlined />} 
+            className="bg-green-50 text-green-600 border border-green-200" 
+          />
           <div className="flex-1 min-w-0">
-            <Text className="text-xs font-medium text-gray-700 block truncate">
+            <Text className="text-sm font-medium text-gray-700 block truncate">
               {investigation.doctor?.name || 'Doctor Name'}
             </Text>
-            <Text className="text-xs text-gray-500">
+            <Text className="text-xs text-gray-500 truncate">
               {investigation.doctor?.specialization}
             </Text>
           </div>
         </div>
 
+        {/* Spacer to push footer to bottom */}
+        <div className="flex-grow"></div>
+
         {/* Date and Amount */}
-        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-          <div className="flex items-center space-x-1">
-            <CalendarOutlined className="text-gray-400 text-xs" />
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+          <div className="flex items-center space-x-2">
+            <CalendarOutlined className="text-gray-400 text-sm" />
             <Text className="text-xs text-gray-500">
-              {dayjs(investigation.createdAt).format('DD MMM')}
+              {dayjs(investigation.createdAt).format('DD MMM YYYY')}
             </Text>
           </div>
-          <Text className="font-semibold text-gray-900 text-sm">
+          <Text className="font-bold text-gray-900 text-sm">
             {formatCurrency(investigation.totalAmount)}
           </Text>
         </div>
 
         {/* Status Badge */}
-        <div className="flex justify-center">
+        <div className="flex justify-center pt-2">
           <Tag 
             color={getStatusColor(investigation.status)} 
-            className="px-3 py-1 text-xs font-medium rounded-full border-0"
+            className="px-4 py-1 text-xs font-medium rounded-full border-0"
           >
             {investigation.status}
           </Tag>
