@@ -92,6 +92,8 @@ describe('InvestigationService', () => {
         testIds: [testId],
         priority: 'Normal' as const,
         notes: 'Test investigation notes',
+        totalAmount: 500,
+        order: 1,
       };
 
       await expect(InvestigationService.createInvestigation(investigationData))
@@ -106,6 +108,8 @@ describe('InvestigationService', () => {
         testIds: [testId],
         priority: 'Normal' as const,
         notes: 'Test investigation notes',
+        totalAmount: 500,
+        order: 1,
       };
 
       await expect(InvestigationService.createInvestigation(investigationData))
@@ -120,6 +124,8 @@ describe('InvestigationService', () => {
         testIds: [new mongoose.Types.ObjectId().toString()],
         priority: 'Normal' as const,
         notes: 'Test investigation notes',
+        totalAmount: 500,
+        order: 1,
       };
 
       await expect(InvestigationService.createInvestigation(investigationData))
@@ -144,6 +150,8 @@ describe('InvestigationService', () => {
         testIds: [testId, (test2._id as mongoose.Types.ObjectId).toString()],
         priority: 'High' as const,
         notes: 'Multiple tests investigation',
+        totalAmount: 800,
+        order: 1,
       };
 
       const result = await InvestigationService.createInvestigation(investigationData);
