@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Layout, notification } from 'antd';
 import { Header } from './components/Layout/Header';
 import { Sidebar } from './components/Layout/Sidebar';
@@ -22,6 +22,12 @@ function App() {
   const [investigations, setInvestigations] = useState<Investigation[]>([]);
   const [filteredInvestigations, setFilteredInvestigations] = useState<Investigation[]>([]);
   const [loading, setLoading] = useState(false);
+  
+  // Filter states
+  const [selectedStatusFilters, setSelectedStatusFilters] = useState<string[]>([]);
+  const [selectedPriorityFilters, setSelectedPriorityFilters] = useState<string[]>([]);
+  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   // Modal states
   const [investigationModalVisible, setInvestigationModalVisible] = useState(false);
@@ -36,10 +42,46 @@ function App() {
     loadInvestigations();
   }, []);
 
-  // Update filtered investigations when investigations change
+  // Unified filtering function
+  const applyFilters = useCallback(() => {
+    let filtered = [...investigations];
+
+    // Apply status filter
+    if (selectedStatusFilters.length > 0) {
+      filtered = filtered.filter(inv => selectedStatusFilters.includes(inv.status));
+    }
+
+    // Apply priority filter
+    if (selectedPriorityFilters.length > 0) {
+      filtered = filtered.filter(inv => selectedPriorityFilters.includes(inv.priority));
+    }
+
+    // Apply date range filter
+    if (dateRange) {
+      const [start, end] = dateRange;
+      filtered = filtered.filter(inv => {
+        const createdDate = dayjs(inv.createdAt);
+        return createdDate.isAfter(start.startOf('day')) && createdDate.isBefore(end.endOf('day'));
+      });
+    }
+
+    // Apply search filter
+    if (searchTerm.trim()) {
+      filtered = filtered.filter(inv =>
+        inv.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        inv.patient?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        inv.doctor?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        inv.tests?.some(test => test.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    }
+
+    setFilteredInvestigations(filtered);
+  }, [investigations, selectedStatusFilters, selectedPriorityFilters, dateRange, searchTerm]);
+
+  // Apply filters whenever any filter state changes
   useEffect(() => {
-    setFilteredInvestigations(investigations);
-  }, [investigations]);
+    applyFilters();
+  }, [applyFilters]);
 
   const loadInvestigations = async () => {
     setLoading(true);
@@ -172,52 +214,19 @@ function App() {
 
   // Filter functions
   const handleDateRangeChange = (dates: [dayjs.Dayjs, dayjs.Dayjs] | null) => {
-    if (!dates) {
-      setFilteredInvestigations(investigations);
-      return;
-    }
-
-    const [start, end] = dates;
-    const filtered = investigations.filter(inv => {
-      const createdDate = dayjs(inv.createdAt);
-      return createdDate.isAfter(start.startOf('day')) && createdDate.isBefore(end.endOf('day'));
-    });
-    setFilteredInvestigations(filtered);
+    setDateRange(dates);
   };
 
   const handleStatusFilter = (statuses: string[]) => {
-    if (statuses.length === 0) {
-      setFilteredInvestigations(investigations);
-      return;
-    }
-
-    const filtered = investigations.filter(inv => statuses.includes(inv.status));
-    setFilteredInvestigations(filtered);
+    setSelectedStatusFilters(statuses);
   };
 
   const handlePriorityFilter = (priorities: string[]) => {
-    if (priorities.length === 0) {
-      setFilteredInvestigations(investigations);
-      return;
-    }
-
-    const filtered = investigations.filter(inv => priorities.includes(inv.priority));
-    setFilteredInvestigations(filtered);
+    setSelectedPriorityFilters(priorities);
   };
 
-  const handleSearch = (searchTerm: string) => {
-    if (!searchTerm.trim()) {
-      setFilteredInvestigations(investigations);
-      return;
-    }
-
-    const filtered = investigations.filter(inv =>
-      inv.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      inv.patient?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      inv.doctor?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      inv.tests?.some(test => test.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-    setFilteredInvestigations(filtered);
+  const handleSearch = (searchTermValue: string) => {
+    setSearchTerm(searchTermValue);
   };
 
   // Create Kanban columns
@@ -232,7 +241,12 @@ function App() {
       { id: 'revision-required', title: 'Revision Required', color: '#f5222d', bgColor: '#FF6B6B' }
     ];
 
-    return statusConfig.map(config => {
+    // If status filters are applied, only show selected status columns
+    const columnsToShow = selectedStatusFilters.length > 0 
+      ? statusConfig.filter(config => selectedStatusFilters.includes(config.title))
+      : statusConfig;
+
+    return columnsToShow.map(config => {
       const statusInvestigations = filteredInvestigations
         .filter(inv => inv.status === config.title)
         .sort((a, b) => a.order - b.order); // Sort by order field
