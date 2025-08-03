@@ -63,6 +63,8 @@ describe('InvestigationService', () => {
         testIds: [testId],
         priority: 'Normal' as const,
         notes: 'Test investigation notes',
+        totalAmount: 500,
+        order: 1,
       };
 
       const result = await InvestigationService.createInvestigation(investigationData);
