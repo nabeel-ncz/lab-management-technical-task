@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Tag, Avatar, Space, Typography } from 'antd';
+import { Card, Tag, Avatar, Typography } from 'antd';
 import { UserOutlined, TeamOutlined, CalendarOutlined } from '@ant-design/icons';
 import { Investigation } from '../../types';
 import dayjs from 'dayjs';
@@ -30,16 +30,16 @@ export const InvestigationCard: React.FC<InvestigationCardProps> = ({ investigat
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'New Requests': return 'blue';
-      case 'In Progress': return 'purple';
-      case 'Under Review': return 'cyan';
-      case 'Approved': return 'green';
-      case 'Revision required': return 'red';
-      default: return 'default';
-    }
-  };
+  // const getStatusColor = (status: string) => {
+  //   switch (status) {
+  //     case 'New Requests': return 'blue';
+  //     case 'In Progress': return 'purple';
+  //     case 'Under Review': return 'cyan';
+  //     case 'Approved': return 'green';
+  //     case 'Revision required': return 'red';
+  //     default: return 'default';
+  //   }
+  // };
 
   const formatCurrency = (amount: number) => {
     return `₹${amount.toLocaleString()}`;
@@ -136,16 +136,6 @@ export const InvestigationCard: React.FC<InvestigationCardProps> = ({ investigat
           <Text className="font-bold text-gray-900 text-sm">
             {formatCurrency(investigation.totalAmount)}
           </Text>
-        </div>
-
-        {/* Status Badge */}
-        <div className="flex justify-center pt-2">
-          <Tag 
-            color={getStatusColor(investigation.status)} 
-            className="px-4 py-1 text-xs font-medium rounded-full border-0"
-          >
-            {investigation.status}
-          </Tag>
         </div>
       </div>
     </Card>

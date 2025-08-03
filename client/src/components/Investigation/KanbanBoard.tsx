@@ -53,7 +53,6 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ columns, loading, onCa
               </div>
             </div>
 
-            {/* Row Body - Horizontal Cards with White Background */}
             <div className="p-6 bg-gray-50">
               {column.investigations.length === 0 ? (
                 <div className="text-center py-12">
