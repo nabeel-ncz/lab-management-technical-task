@@ -175,13 +175,67 @@ export const mockTests: Test[] = [
 ];
 
 export const mockInvestigations: Investigation[] = [
-  // New Requests - order 1-4
+  // Advised - order 1-2
+  {
+    id: 'MHN001250',
+    patientId: 'P001',
+    doctorId: 'D001',
+    testIds: ['T001'],
+    status: 'Advised',
+    priority: 'Normal',
+    totalAmount: 1200,
+    notes: 'Doctor advised thyroid function test',
+    order: 1,
+    createdAt: '2024-01-21T08:30:00Z',
+    updatedAt: '2024-01-21T08:30:00Z'
+  },
+  {
+    id: 'MHN001251',
+    patientId: 'P002',
+    doctorId: 'D002',
+    testIds: ['T002'],
+    status: 'Advised',
+    priority: 'High',
+    totalAmount: 800,
+    notes: 'Follow-up liver function advised',
+    order: 2,
+    createdAt: '2024-01-21T09:15:00Z',
+    updatedAt: '2024-01-21T09:15:00Z'
+  },
+  // Billing - order 1-2
+  {
+    id: 'MHN001252',
+    patientId: 'P003',
+    doctorId: 'D003',
+    testIds: ['T003'],
+    status: 'Billing',
+    priority: 'Normal',
+    totalAmount: 500,
+    notes: 'Ready for billing process',
+    order: 1,
+    createdAt: '2024-01-21T10:00:00Z',
+    updatedAt: '2024-01-21T10:00:00Z'
+  },
+  {
+    id: 'MHN001253',
+    patientId: 'P004',
+    doctorId: 'D004',
+    testIds: ['T004', 'T005'],
+    status: 'Billing',
+    priority: 'Normal',
+    totalAmount: 1300,
+    notes: 'Multiple tests for billing',
+    order: 2,
+    createdAt: '2024-01-21T10:30:00Z',
+    updatedAt: '2024-01-21T10:30:00Z'
+  },
+  // New Investigations - order 1-4
   {
     id: 'MHN001236',
     patientId: 'P001',
     doctorId: 'D001',
     testIds: ['T001'],
-    status: 'New Requests',
+    status: 'New Investigations',
     priority: 'Normal',
     totalAmount: 1200,
     notes: 'Routine thyroid check-up',
@@ -194,7 +248,7 @@ export const mockInvestigations: Investigation[] = [
     patientId: 'P002',
     doctorId: 'D002',
     testIds: ['T002'],
-    status: 'New Requests',
+    status: 'New Investigations',
     priority: 'Normal',
     totalAmount: 800,
     notes: 'Follow-up liver function assessment',
@@ -207,7 +261,7 @@ export const mockInvestigations: Investigation[] = [
     patientId: 'P003',
     doctorId: 'D003',
     testIds: ['T004'],
-    status: 'New Requests',
+    status: 'New Investigations',
     priority: 'Emergency',
     totalAmount: 600,
     notes: 'Urgent kidney function check',
@@ -220,7 +274,7 @@ export const mockInvestigations: Investigation[] = [
     patientId: 'P004',
     doctorId: 'D004',
     testIds: ['T003', 'T005'],
-    status: 'New Requests',
+    status: 'New Investigations',
     priority: 'Normal',
     totalAmount: 1200,
     notes: 'Complete health check-up',
@@ -348,13 +402,13 @@ export const mockInvestigations: Investigation[] = [
     createdAt: '2024-01-17T12:15:00Z',
     updatedAt: '2024-01-20T22:00:00Z'
   },
-  // Revision required - order 1-2
+  // Revision Required - order 1-2
   {
     id: 'MHN001245',
     patientId: 'P005',
     doctorId: 'D001',
     testIds: ['T002'],
-    status: 'Revision required',
+    status: 'Revision Required',
     priority: 'High',
     totalAmount: 800,
     notes: 'Liver function needs retest',
@@ -367,7 +421,7 @@ export const mockInvestigations: Investigation[] = [
     patientId: 'P001',
     doctorId: 'D004',
     testIds: ['T003'],
-    status: 'Revision required',
+    status: 'Revision Required',
     priority: 'Normal',
     totalAmount: 500,
     notes: 'Sample quality issues',

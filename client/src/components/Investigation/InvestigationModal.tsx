@@ -42,20 +42,24 @@ export const InvestigationModal: React.FC<InvestigationModalProps> = ({
   };
 
   const statusOptions = [
-    { label: 'New Requests', value: 'New Requests' },
+    { label: 'Advised', value: 'Advised' },
+    { label: 'Billing', value: 'Billing' },
+    { label: 'New Investigations', value: 'New Investigations' },
     { label: 'In Progress', value: 'In Progress' },
     { label: 'Under Review', value: 'Under Review' },
     { label: 'Approved', value: 'Approved' },
-    { label: 'Revision required', value: 'Revision required' },
+    { label: 'Revision Required', value: 'Revision Required' },
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'New Requests': return 'blue';
+      case 'Advised': return 'orange';
+      case 'Billing': return 'gold';
+      case 'New Investigations': return 'blue';
       case 'In Progress': return 'purple';
       case 'Under Review': return 'cyan';
       case 'Approved': return 'green';
-      case 'Revision required': return 'red';
+      case 'Revision Required': return 'red';
       default: return 'default';
     }
   };

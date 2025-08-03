@@ -21,11 +21,13 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   onRefresh
 }) => {
   const statusOptions = [
-    { label: 'New Requests', value: 'New Requests' },
+    { label: 'Advised', value: 'Advised' },
+    { label: 'Billing', value: 'Billing' },
+    { label: 'New Investigations', value: 'New Investigations' },
     { label: 'In Progress', value: 'In Progress' },
     { label: 'Under Review', value: 'Under Review' },
     { label: 'Approved', value: 'Approved' },
-    { label: 'Revision required', value: 'Revision required' },
+    { label: 'Revision Required', value: 'Revision Required' },
   ];
 
   const priorityOptions = [

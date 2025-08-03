@@ -37,7 +37,7 @@ export interface Investigation {
   patientId: string;
   doctorId: string;
   testIds: string[];
-  status: 'New Requests' | 'In Progress' | 'Under Review' | 'Approved' | 'Revision required';
+  status: 'Advised' | 'Billing' | 'New Investigations' | 'In Progress' | 'Under Review' | 'Approved' | 'Revision Required';
   priority: 'Emergency' | 'Normal' | 'High';
   totalAmount: number;
   reportFile?: string;

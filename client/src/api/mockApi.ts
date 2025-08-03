@@ -184,11 +184,13 @@ class MockApi {
     
     // Map column IDs to status strings
     const statusMap: Record<string, Investigation['status']> = {
-      'new-requests': 'New Requests',
+      'advised': 'Advised',
+      'billing': 'Billing',
+      'new-investigations': 'New Investigations',
       'in-progress': 'In Progress',
       'under-review': 'Under Review',
       'approved': 'Approved',
-      'revision-required': 'Revision required'
+      'revision-required': 'Revision Required'
     };
     
     const status = statusMap[newStatus] || newStatus as Investigation['status'];

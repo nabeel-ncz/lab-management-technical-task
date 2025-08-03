@@ -104,7 +104,7 @@ function App() {
     try {
       const newInvestigation = await api.createInvestigation({
         ...data,
-        status: 'New Requests',
+        status: 'New Investigations',
         notes: data.notes || ''
       });
       setInvestigations(prev => [...prev, newInvestigation]);
@@ -222,18 +222,20 @@ function App() {
   // Create Kanban columns
   const createKanbanColumns = (): KanbanColumn[] => {
     const statusConfig = [
-      { id: 'new-requests', title: 'New Requests', color: '#1890ff', bgColor: '#6495ED' },
+      { id: 'advised', title: 'Advised', color: '#faad14', bgColor: '#FFA500' },
+      { id: 'billing', title: 'Billing', color: '#fa8c16', bgColor: '#FF8C42' },
+      { id: 'new-investigations', title: 'New Investigations', color: '#1890ff', bgColor: '#6495ED' },
       { id: 'in-progress', title: 'In Progress', color: '#722ed1', bgColor: '#9370DB' },
       { id: 'under-review', title: 'Under Review', color: '#13c2c2', bgColor: '#20B2AA' },
       { id: 'approved', title: 'Approved', color: '#52c41a', bgColor: '#32CD32' },
-      { id: 'revision-required', title: 'Revision required', color: '#f5222d', bgColor: '#FF6B6B' }
+      { id: 'revision-required', title: 'Revision Required', color: '#f5222d', bgColor: '#FF6B6B' }
     ];
 
     return statusConfig.map(config => {
       const statusInvestigations = filteredInvestigations
         .filter(inv => inv.status === config.title)
         .sort((a, b) => a.order - b.order); // Sort by order field
-
+      
       return {
         ...config,
         investigations: statusInvestigations,
