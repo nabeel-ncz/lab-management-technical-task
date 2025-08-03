@@ -57,6 +57,32 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     return `₹${amount.toLocaleString()}`;
   };
 
+  const calculatePriorityStats = (investigations: Investigation[]) => {
+    const stats = {
+      Emergency: 0,
+      High: 0,
+      Normal: 0,
+      total: investigations.length
+    };
+
+    investigations.forEach(inv => {
+      if (inv.priority === 'Emergency') stats.Emergency++;
+      else if (inv.priority === 'High') stats.High++;
+      else if (inv.priority === 'Normal') stats.Normal++;
+    });
+
+    return stats;
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'Emergency': return '#ff4d4f';
+      case 'High': return '#fa8c16'; 
+      case 'Normal': return '#52c41a';
+      default: return '#d9d9d9';
+    }
+  };
+
   const findInvestigation = (id: string) => {
     for (const column of localColumns) {
       const investigation = column.investigations.find(inv => inv.id === id);
@@ -332,6 +358,40 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     </div>
                   )}
                 </SortableContext>
+              </div>
+
+              {/* Footer with priority breakdown */}
+              <div className="px-6 py-4 bg-white border-t border-gray-200 rounded-b-xl">
+                {(() => {
+                  const priorityStats = calculatePriorityStats(column.investigations);
+                  return (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-3">
+                          {(['Emergency', 'High', 'Normal'] as const).map(priority => (
+                            <div key={priority} className="flex items-center space-x-1">
+                              <div 
+                                className="w-3 h-3 rounded-full"
+                                style={{ backgroundColor: getPriorityColor(priority) }}
+                              />
+                              <Text className="text-gray-700 text-sm">
+                                {priority}: {priorityStats[priority]}
+                              </Text>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Text className="text-gray-600 text-sm">Total:</Text>
+                        <div className="px-3 py-1 bg-blue-100 rounded-full">
+                          <Text className="text-blue-800 text-sm font-semibold">
+                            {priorityStats.total} {priorityStats.total === 1 ? 'Request' : 'Requests'}
+                          </Text>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </Card>
           </DroppableStatusContainer>
