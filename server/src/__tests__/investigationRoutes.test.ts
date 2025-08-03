@@ -128,7 +128,7 @@ describe("Investigation Routes", () => {
 
       const response = await request(app)
         .get("/api/investigations")
-        .query({ status: ["In Progress", "Advised"] })
+        .query({ "status[]": ["In Progress", "Advised"] })
         .expect(200);
 
       expect(response.body.data).toHaveLength(1);
@@ -148,7 +148,10 @@ describe("Investigation Routes", () => {
         order: 2,
       });
 
-      const response = await request(app).get("/api/investigations").query({ priority: ["Emergency"] }).expect(200);
+      const response = await request(app)
+        .get("/api/investigations")
+        .query({ "priority[]": ["Emergency"] }) 
+        .expect(200);
 
       expect(response.body.data).toHaveLength(1);
       expect(response.body.data[0].priority).toBe("Emergency");
@@ -162,7 +165,10 @@ describe("Investigation Routes", () => {
     });
 
     it("should return empty array when no investigations match filter", async () => {
-      const response = await request(app).get("/api/investigations").query({ status: ["Approved"] }).expect(200);
+      const response = await request(app)
+        .get("/api/investigations")
+        .query({ "status[]": ["Approved"] })
+        .expect(200);
 
       expect(response.body.data).toHaveLength(0);
     });
@@ -202,7 +208,7 @@ describe("Investigation Routes", () => {
 
       expect(response.body).toMatchObject({
         success: false,
-        error: expect.stringContaining("validation"),
+        error: "Invalid ID format",
       });
     });
   });

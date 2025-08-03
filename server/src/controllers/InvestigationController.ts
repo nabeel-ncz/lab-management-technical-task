@@ -3,6 +3,7 @@ import { InvestigationService } from '../services';
 import { sendSuccess, sendError, sendServerError } from '../utils/response';
 import { asyncHandler } from '../middleware/errorHandler';
 import { InvestigationQuery } from '../schemas/validation';
+import mongoose from 'mongoose';
 
 export class InvestigationController {
   getAllInvestigations = asyncHandler(async (req: Request, res: Response) => {
@@ -20,7 +21,6 @@ export class InvestigationController {
         page: req.query.page ? parseInt(req.query.page as string) : 1,
         limit: req.query.limit ? parseInt(req.query.limit as string) : 10,
       };
-
       const investigations = await InvestigationService.getAllInvestigations(query);
       return sendSuccess(res, investigations);
     } catch (error) {
@@ -32,6 +32,11 @@ export class InvestigationController {
   getInvestigationById = asyncHandler(async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
+      
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return sendError(res, 'Invalid ID format', 400);
+      }
+
       const investigation = await InvestigationService.getInvestigationById(id);
       
       if (!investigation) {
