@@ -4,7 +4,7 @@ import { InvestigationInput, InvestigationUpdateInput, MoveInvestigationInput, I
 import { Investigation as InvestigationType, PaginatedResponse } from '../types';
 
 export class InvestigationService {
-  async getAllInvestigations(query: InvestigationQuery = {}): Promise<InvestigationType[]> {
+  async getAllInvestigations(query: InvestigationQuery = { page: 1, limit: 10 }): Promise<InvestigationType[]> {
     try {
       const filter: any = {};
 
@@ -51,12 +51,12 @@ export class InvestigationService {
       if (query.search) {
         const searchTerm = query.search.toLowerCase();
         investigations = investigations.filter(inv => {
-          const investigationObj = inv.toJSON();
+          const investigationObj = inv.toJSON() as any;
           return (
             investigationObj.id.toLowerCase().includes(searchTerm) ||
             (investigationObj.patient?.name?.toLowerCase().includes(searchTerm)) ||
             (investigationObj.doctor?.name?.toLowerCase().includes(searchTerm)) ||
-            (investigationObj.tests?.some(test => test.name.toLowerCase().includes(searchTerm)))
+            (investigationObj.tests?.some((test: any) => test.name.toLowerCase().includes(searchTerm)))
           );
         });
       }
