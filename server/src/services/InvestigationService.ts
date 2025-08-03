@@ -42,9 +42,9 @@ export class InvestigationService {
 
       let investigations = await Investigation
         .find(filter)
-        .populate('patientId', null, 'Patient')
-        .populate('doctorId', null, 'Doctor')
-        .populate('testIds', null, 'Test')
+        .populate('patient')
+        .populate('doctor')
+        .populate('tests')
         .sort({ status: 1, order: 1 });
 
       // Apply search filter (after population for better performance)
@@ -71,9 +71,9 @@ export class InvestigationService {
     try {
       const investigation = await Investigation
         .findById(id)
-        .populate('patientId', null, 'Patient')
-        .populate('doctorId', null, 'Doctor')
-        .populate('testIds', null, 'Test');
+        .populate('patient')
+        .populate('doctor')
+        .populate('tests');
 
       return investigation ? this.populateInvestigation(investigation) : null;
     } catch (error) {
@@ -109,9 +109,9 @@ export class InvestigationService {
       // Populate and return
       const populatedInvestigation = await Investigation
         .findById(savedInvestigation._id)
-        .populate('patientId', null, 'Patient')
-        .populate('doctorId', null, 'Doctor')
-        .populate('testIds', null, 'Test');
+        .populate('patient')
+        .populate('doctor')
+        .populate('tests');
 
       return this.populateInvestigation(populatedInvestigation!);
     } catch (error: any) {
@@ -137,9 +137,9 @@ export class InvestigationService {
           runValidators: true 
         }
       )
-      .populate('patientId', null, 'Patient')
-      .populate('doctorId', null, 'Doctor')
-      .populate('testIds', null, 'Test');
+      .populate('patient')
+      .populate('doctor')
+      .populate('tests');
 
       if (!investigation) {
         throw new Error('Investigation not found');
@@ -233,9 +233,9 @@ export class InvestigationService {
         // Get the updated investigation with populated data
         const updatedInvestigation = await Investigation
           .findById(id)
-          .populate('patientId', null, 'Patient')
-          .populate('doctorId', null, 'Doctor')
-          .populate('testIds', null, 'Test')
+          .populate('patient')
+          .populate('doctor')
+          .populate('tests')
           .session(session);
 
         return this.populateInvestigation(updatedInvestigation!);
@@ -313,25 +313,25 @@ export class InvestigationService {
   }
 
   private populateInvestigation(investigation: any): InvestigationType {
-    const investigationObj = investigation.toJSON();
-    
-    return {
-      ...investigationObj,
-      patient: investigationObj.patientId,
-      doctor: investigationObj.doctorId,
-      tests: investigationObj.testIds,
-      patientId: typeof investigationObj.patientId === 'object' 
-        ? investigationObj.patientId.id || investigationObj.patientId._id.toString()
-        : investigationObj.patientId,
-      doctorId: typeof investigationObj.doctorId === 'object'
-        ? investigationObj.doctorId.id || investigationObj.doctorId._id.toString()
-        : investigationObj.doctorId,
-      testIds: Array.isArray(investigationObj.testIds)
-        ? investigationObj.testIds.map((test: any) => 
-            typeof test === 'object' ? test.id || test._id.toString() : test
-          )
-        : investigationObj.testIds
-    };
+    // const investigationObj = investigation.toJSON();
+    // return {
+    //   ...investigationObj,
+    //   patient: investigationObj.patientId,
+    //   doctor: investigationObj.doctorId,
+    //   tests: investigationObj.testIds,
+    //   patientId: typeof investigationObj.patientId === 'object' 
+    //     ? investigationObj.patientId.id || investigationObj.patientId._id.toString()
+    //     : investigationObj.patientId,
+    //   doctorId: typeof investigationObj.doctorId === 'object'
+    //     ? investigationObj.doctorId.id || investigationObj.doctorId._id.toString()
+    //     : investigationObj.doctorId,
+    //   testIds: Array.isArray(investigationObj.testIds)
+    //     ? investigationObj.testIds.map((test: any) => 
+    //         typeof test === 'object' ? test.id || test._id.toString() : test
+    //       )
+    //     : investigationObj.testIds
+    // };
+    return investigation.toJSON();
   }
 }
 
