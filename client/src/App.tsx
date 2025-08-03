@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout, notification } from 'antd';
 import { Header } from './components/Layout/Header';
 import { Sidebar } from './components/Layout/Sidebar';
@@ -11,6 +11,7 @@ import { TestForm } from './components/Forms/TestForm';
 import { FilterBar } from './components/Filters/FilterBar';
 import { Investigation, KanbanColumn } from './types';
 import { InvestigationFormData, PatientFormData, DoctorFormData, TestFormData } from './schemas';
+import { StatCards } from './components/Cards/StatCards';
 import { api } from './api/mockApi';
 import dayjs from 'dayjs';
 
@@ -235,7 +236,7 @@ function App() {
       const statusInvestigations = filteredInvestigations
         .filter(inv => inv.status === config.title)
         .sort((a, b) => a.order - b.order); // Sort by order field
-      
+
       return {
         ...config,
         investigations: statusInvestigations,
@@ -266,6 +267,7 @@ function App() {
         />
 
         <Content className="p-6">
+          <StatCards investigations={filteredInvestigations} />
           <FilterBar
             onDateRangeChange={handleDateRangeChange}
             onStatusFilter={handleStatusFilter}
