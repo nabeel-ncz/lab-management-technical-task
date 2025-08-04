@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import "dotenv/config";
 import connectDB from '../config/database';
 import { Patient, Doctor, Test, Investigation } from '../models';
 

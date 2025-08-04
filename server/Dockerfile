@@ -25,4 +25,4 @@ RUN adduser -S nodeuser -u 1001
 USER nodeuser
 
 # Start the application
-CMD ["npm", "start"] 
+CMD ["npm", "run", "docker:start"] 

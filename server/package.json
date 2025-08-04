@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "tsx --watch --env-file .env src/index.ts",
     "start": "node --env-file .env dist/src/index.js",
+    "docker:dev": "tsx --watch src/index.ts",
+    "docker:start": "node dist/src/index.js",
+    "docker:seed": "tsx src/scripts/seed.ts",
     "build": "tsc",
     "type-check": "tsc --noEmit",
     "lint": "eslint .",

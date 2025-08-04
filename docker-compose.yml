@@ -7,7 +7,7 @@ services:
     container_name: lab-mongodb
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "27018:27017"
     environment:
       MONGO_INITDB_DATABASE: lab-management-system
     volumes:
@@ -29,10 +29,10 @@ services:
       - NODE_ENV=development
       - MONGODB_URI=mongodb://mongodb:27017/lab-management-system
       - CORS_ORIGINS=http://localhost:5173,http://frontend:5173
-      - AWS_REGION=us-east-1
-      - AWS_ACCESS_KEY_ID=your_access_key_here
-      - AWS_SECRET_ACCESS_KEY=your_secret_key_here
-      - AWS_S3_BUCKET_NAME=lab-management-reports
+      - AWS_REGION=ap-south-1
+      - AWS_ACCESS_KEY_ID=testkeyid
+      - AWS_SECRET_ACCESS_KEY=testkeysecret
+      - AWS_S3_BUCKET_NAME=nabeeltestlab
     volumes:
       - ./server:/app
       - /app/node_modules
@@ -40,7 +40,7 @@ services:
       - mongodb
     networks:
       - lab-network
-    command: sh -c "sleep 10 && npm run dev"
+    command: sh -c "sleep 10 && npm run docker:seed && npm run docker:dev"
 
   # Frontend React App
   frontend:
@@ -51,6 +51,10 @@ services:
     restart: unless-stopped
     ports:
       - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3000/api
+      - VITE_API_TIMEOUT=10000
+      - VITE_ENVIRONMENT=development
     volumes:
       - ./client:/app
       - /app/node_modules
