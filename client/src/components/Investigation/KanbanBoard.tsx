@@ -340,16 +340,18 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                       )}
                     </div>
                   ) : (
-                    <div className="flex gap-6 overflow-x-auto pb-4 items-start min-h-[150px]">
+                    <div className="flex gap-3 sm:gap-6 overflow-x-auto pb-4 items-start min-h-[150px]">
                       {column.investigations.map((investigation, index) => (
                         <React.Fragment key={investigation.id}>
                           {dropIndicator?.columnId === column.id && dropIndicator.index === index && (
                             <DropIndicator isVisible={true} />
                           )}
-                          <DraggableInvestigationCard
-                            investigation={investigation}
-                            onClick={onCardClick}
-                          />
+                          <div className="flex-shrink-0">
+                            <DraggableInvestigationCard
+                              investigation={investigation}
+                              onClick={onCardClick}
+                            />
+                          </div>
                         </React.Fragment>
                       ))}
                       {dropIndicator?.columnId === column.id && dropIndicator.index === column.investigations.length && (

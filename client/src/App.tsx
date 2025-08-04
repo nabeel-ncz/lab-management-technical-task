@@ -273,7 +273,7 @@ function App() {
         trigger={null}
         collapsible
         collapsed={collapsed}
-        className="!bg-white shadow-lg z-10"
+        className="!bg-white shadow-lg z-10 hidden md:flex"
       >
         <Sidebar collapsed={collapsed} />
       </Sider>
@@ -285,7 +285,7 @@ function App() {
           onNewInvestigation={() => setInvestigationFormVisible(true)}
         />
 
-        <Content className="p-6">
+        <Content className="p-3 sm:p-6">
           <StatCards investigations={filteredInvestigations} />
           <FilterBar
             onDateRangeChange={handleDateRangeChange}

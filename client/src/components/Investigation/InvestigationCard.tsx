@@ -47,11 +47,10 @@ export const InvestigationCard: React.FC<InvestigationCardProps> = ({ investigat
 
   return (
     <Card 
-      className="cursor-pointer hover:shadow-lg transition-all duration-200 rounded-xl"
+      className="cursor-pointer hover:shadow-lg transition-all duration-200 rounded-xl w-full min-w-[250px] max-w-[280px]"
       onClick={() => onClick(investigation)}
       size="small"
       style={{
-        width: '280px',
         height: '320px',
         borderLeft: `4px solid ${getPriorityColor(investigation.priority)}`,
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
