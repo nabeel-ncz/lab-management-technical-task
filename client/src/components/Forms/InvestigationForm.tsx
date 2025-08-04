@@ -10,7 +10,7 @@ const { Text } = Typography;
 interface InvestigationFormProps {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (data: InvestigationFormData) => void;
+  onSubmit: (data: InvestigationFormData, callAfterSuccess: () => void) => void;
   loading?: boolean;
 }
 
@@ -51,6 +51,12 @@ export const InvestigationForm: React.FC<InvestigationFormProps> = ({
     }
   };
 
+
+  const callAfterSuccess = () => {
+    form.resetFields();
+    setSelectedTests([]);
+  }
+
   const handleSubmit = async (values: InvestigationFormData) => {
     try {
       InvestigationSchema.parse(values);
@@ -58,9 +64,7 @@ export const InvestigationForm: React.FC<InvestigationFormProps> = ({
         ...values,
         totalAmount: calculateTotalAmount(),
         order: 1
-      });
-      form.resetFields();
-      setSelectedTests([]);
+      }, callAfterSuccess);
     } catch (error) {
       console.error('Validation error:', error);
     }

@@ -21,8 +21,9 @@ function App() {
   const [collapsed, setCollapsed] = useState(true);
   const [investigations, setInvestigations] = useState<Investigation[]>([]);
   const [filteredInvestigations, setFilteredInvestigations] = useState<Investigation[]>([]);
+  const [newInvestigationLoading, setNewInvestigationLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
   // Filter states
   const [selectedStatusFilters, setSelectedStatusFilters] = useState<string[]>([]);
   const [selectedPriorityFilters, setSelectedPriorityFilters] = useState<string[]>([]);
@@ -143,8 +144,9 @@ function App() {
     }
   };
 
-  const handleCreateInvestigation = async (data: InvestigationFormData) => {
+  const handleCreateInvestigation = async (data: InvestigationFormData, callAfterSuccess: () => void) => {
     try {
+      setNewInvestigationLoading(true);
       const newInvestigation = await api.createInvestigation({
         ...data,
         status: 'New Investigations',
@@ -152,6 +154,7 @@ function App() {
       });
       setInvestigations(prev => [...prev, newInvestigation]);
       setInvestigationFormVisible(false);
+      callAfterSuccess();
       notification.success({
         message: 'Success',
         description: 'Investigation created successfully'
@@ -161,6 +164,8 @@ function App() {
         message: 'Error',
         description: 'Failed to create investigation'
       });
+    } finally {
+      setNewInvestigationLoading(false);
     }
   };
 
@@ -242,7 +247,7 @@ function App() {
     ];
 
     // If status filters are applied, only show selected status columns
-    const columnsToShow = selectedStatusFilters.length > 0 
+    const columnsToShow = selectedStatusFilters.length > 0
       ? statusConfig.filter(config => selectedStatusFilters.includes(config.title))
       : statusConfig;
 
@@ -314,6 +319,7 @@ function App() {
         visible={investigationFormVisible}
         onClose={() => setInvestigationFormVisible(false)}
         onSubmit={handleCreateInvestigation}
+        loading={newInvestigationLoading}
       />
 
       <PatientForm
