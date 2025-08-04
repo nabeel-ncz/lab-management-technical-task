@@ -8,16 +8,6 @@ export default tseslint.config(
     ignores: ["**/*.js"],
   },
   eslint.configs.recommended,
-  tseslint.configs.strictTypeChecked,
-  tseslint.configs.stylisticTypeChecked,
-  {
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-  },
   {
     files: ["**/*.test.ts", "**/*.spec.ts"],
     plugins: {

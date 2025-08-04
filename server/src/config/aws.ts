@@ -5,7 +5,7 @@ const configureAWS = () => {
   AWS.config.update({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_REGION || 'us-east-1',
+    region: process.env.AWS_REGION ?? 'us-east-1',
   });
 };
 
@@ -18,7 +18,7 @@ const createS3Instance = () => {
 // S3 upload helper
 export const uploadToS3 = async (
   file: Express.Multer.File,
-  folder: string = 'reports'
+  folder = 'reports'
 ): Promise<string> => {
   const s3 = createS3Instance();
   const bucketName = process.env.AWS_S3_BUCKET_NAME;
@@ -27,7 +27,7 @@ export const uploadToS3 = async (
     throw new Error('AWS S3 bucket name is not configured');
   }
 
-  const key = `${folder}/${Date.now()}-${file.originalname}`;
+  const key = `${folder}/${Date.now().toString()}-${file.originalname?.toLowerCase()?.replace(/ /g, '-')}`;
 
   const params = {
     Bucket: bucketName,

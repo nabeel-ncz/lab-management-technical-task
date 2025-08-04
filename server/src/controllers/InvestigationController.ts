@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 import { InvestigationService } from '../services';
 import { sendSuccess, sendError, sendServerError } from '../utils/response';
 import { asyncHandler } from '../middleware/errorHandler';
-import { InvestigationQuery } from '../schemas/validation';
+import { InvestigationQuery, InvestigationInput, InvestigationUpdateInput, MoveInvestigationInput } from '../schemas/validation';
+import { uploadToS3, deleteFromS3 } from '../config/aws';
 import mongoose from 'mongoose';
 
 export class InvestigationController {
@@ -52,7 +53,8 @@ export class InvestigationController {
 
   createInvestigation = asyncHandler(async (req: Request, res: Response) => {
     try {
-      const investigation = await InvestigationService.createInvestigation(req.body);
+      const investigationData = req.body as InvestigationInput;
+      const investigation = await InvestigationService.createInvestigation(investigationData);
       return sendSuccess(res, investigation, 'Investigation created successfully', 201);
     } catch (error) {
       console.error('Create investigation error:', error);
@@ -66,7 +68,8 @@ export class InvestigationController {
   updateInvestigation = asyncHandler(async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const investigation = await InvestigationService.updateInvestigation(id, req.body);
+      const updateData = req.body as InvestigationUpdateInput;
+      const investigation = await InvestigationService.updateInvestigation(id, updateData);
       return sendSuccess(res, investigation, 'Investigation updated successfully');
     } catch (error) {
       console.error('Update investigation error:', error);
@@ -95,15 +98,15 @@ export class InvestigationController {
   moveInvestigation = asyncHandler(async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const { newStatus, newIndex } = req.body;
+      const moveData = req.body as MoveInvestigationInput;
 
-      if (!newStatus || typeof newIndex !== 'number') {
+      if (!moveData.newStatus || typeof moveData.newIndex !== 'number') {
         return sendError(res, 'newStatus and newIndex are required');
       }
 
       const investigation = await InvestigationService.moveInvestigation(id, {
-        newStatus,
-        newIndex
+        newStatus: moveData.newStatus,
+        newIndex: moveData.newIndex
       });
 
       return sendSuccess(res, investigation, 'Investigation moved successfully');
@@ -137,13 +140,24 @@ export class InvestigationController {
         return sendError(res, 'No file uploaded');
       }
 
-      // This would typically involve uploading to S3 and getting the URL
-      // For now, we'll simulate this with a placeholder implementation
-      const reportUrl = `https://example-bucket.s3.amazonaws.com/reports/${Date.now()}-${file.originalname}`;
+      const currentInvestigation = await InvestigationService.getInvestigationById(id);
+      if (!currentInvestigation) {
+        return sendError(res, 'Investigation not found', 404);
+      }
+
+      const reportUrl = await uploadToS3(file, 'reports');
 
       const investigation = await InvestigationService.updateInvestigation(id, {
         reportFile: reportUrl
       });
+
+      if (currentInvestigation.reportFile) {
+        try {
+          await deleteFromS3(currentInvestigation.reportFile);
+        } catch (deleteError) {
+          console.warn('Failed to delete old report file:', deleteError);
+        }
+      }
 
       return sendSuccess(res, investigation, 'Report uploaded successfully');
     } catch (error) {
