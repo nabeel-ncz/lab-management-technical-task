@@ -1,14 +1,13 @@
 import mongoose from 'mongoose';
 import { Investigation, Patient, Doctor, Test } from '../models';
 import { InvestigationInput, InvestigationUpdateInput, MoveInvestigationInput, InvestigationQuery } from '../schemas/validation';
-import { Investigation as InvestigationType, PaginatedResponse } from '../types';
+import { Investigation as InvestigationType } from '../types';
 
 export class InvestigationService {
   async getAllInvestigations(query: InvestigationQuery = { page: 1, limit: 10 }): Promise<InvestigationType[]> {
     try {
       const filter: any = {};
 
-      // Apply filters
       if (query.status && query.status.length > 0) {
         filter.status = { $in: query.status };
       }
@@ -97,6 +96,12 @@ export class InvestigationService {
       const tests = await Test.find({ _id: { $in: investigationData.testIds } });
       if (tests.length !== investigationData.testIds.length) {
         throw new Error('One or more tests not found');
+      }
+
+      const totalAmountCalculated = tests.reduce((acc, test) => acc + test.price, 0);
+
+      if (totalAmountCalculated !== investigationData.totalAmount) {
+        throw new Error('Total amount of tests does not match the total amount of the investigation');
       }
 
       const investigation = new Investigation({

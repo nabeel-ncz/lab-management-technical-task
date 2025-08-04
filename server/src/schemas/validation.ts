@@ -38,6 +38,8 @@ export const InvestigationSchema = z.object({
   testIds: z.array(z.string()).min(1, 'At least one test is required'),
   priority: z.enum(['Emergency', 'Normal', 'High']),
   notes: z.string().optional().default(''),
+  totalAmount: z.number().optional(),
+  order: z.number().optional()
 });
 
 // Update schemas (partial)
