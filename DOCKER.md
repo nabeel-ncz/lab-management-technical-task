@@ -41,6 +41,104 @@ The Docker setup automatically starts:
 
 All services are networked together and configured with the correct environment variables.
 
+## Development Features
+
+- **Hot Reload**: Code changes automatically update the running application
+- **Volume Mounting**: Your local code is mounted into containers
+- **Persistent Database**: Data survives container restarts
+- **Service Dependencies**: Proper startup order (MongoDB → Backend → Frontend)
+- **Zero Configuration**: All environment variables pre-configured
+
+## Troubleshooting
+
+### Common Issues
+
+**Port 27017 already in use (MongoDB conflict):**
+
+This happens when you have MongoDB running locally. Choose one solution:
+
+**Solution 1: Stop local MongoDB**
+```bash
+# On Ubuntu/Debian
+sudo systemctl stop mongod
+
+# On macOS (if installed with brew)
+brew services stop mongodb-community
+
+# On Windows
+net stop MongoDB
+```
+
+**Solution 2: Change Docker port mapping**
+Edit `docker-compose.yml` and change:
+```yaml
+mongodb:
+  ports:
+    - "27018:27017"  # Use port 27018 instead
+```
+Then update backend environment:
+```yaml
+backend:
+  environment:
+    - MONGODB_URI=mongodb://mongodb:27017/lab-management-system  # Internal port stays 27017
+```
+
+**Solution 3: Remove external port exposure**
+Edit `docker-compose.yml` and remove the ports section for MongoDB:
+```yaml
+mongodb:
+  # ports:
+  #   - "27017:27017"  # Comment out or remove this
+```
+
+**Port 3000 or 5173 conflicts:**
+```bash
+# Check what's using the ports
+lsof -i :3000
+lsof -i :5173
+
+# Kill processes using the ports
+sudo kill -9 $(lsof -t -i:3000)
+sudo kill -9 $(lsof -t -i:5173)
+
+# Then start Docker
+docker compose up
+```
+
+**Database connection issues:**
+```bash
+# Check if MongoDB container is running
+docker compose ps
+
+# Restart MongoDB
+docker compose restart mongodb
+
+# Check MongoDB logs
+docker compose logs mongodb
+```
+
+**Frontend not updating:**
+```bash
+# Rebuild frontend container
+docker compose up --build frontend
+```
+
+**Backend API errors:**
+```bash
+# Check backend logs
+docker compose logs backend
+
+# Restart backend
+docker compose restart backend
+```
+
+### Performance Tips
+
+1. **Allocate sufficient resources** to Docker (4GB+ RAM recommended)
+2. **Use .dockerignore** to exclude unnecessary files
+3. **Restart services** individually instead of the entire stack
+4. **Use volumes** for persistent data
+
 ## Useful Commands
 
 ### Basic Operations
@@ -137,6 +235,41 @@ AWS_S3_BUCKET_NAME=lab-management-reports
 ```
 
 For production, set real AWS credentials as environment variables before running.
+
+## Production Deployment
+
+### Production Build
+
+For production environments, use the optimized production configuration:
+
+```bash
+# Set environment variables for production
+export AWS_ACCESS_KEY_ID=your_real_access_key
+export AWS_SECRET_ACCESS_KEY=your_real_secret_key
+export AWS_S3_BUCKET_NAME=your_bucket_name
+
+# Build and run production containers
+docker compose -f docker-compose.prod.yml up --build -d
+```
+
+### Production vs Development
+
+| Feature | Development | Production |
+|---------|-------------|------------|
+| Hot Reload | ✅ Enabled | ❌ Disabled |
+| Build Optimization | ❌ Basic | ✅ Optimized |
+| Security | ❌ Relaxed | ✅ Hardened |
+| File Serving | Dev Server | Static Server |
+| Dependencies | All (dev + prod) | Production only |
+
+## Benefits of Docker Setup
+
+✅ **Zero Configuration** - No need to install Node.js, MongoDB, or manage dependencies  
+✅ **Consistent Environment** - Same setup across all machines  
+✅ **Instant Setup** - One command to start everything  
+✅ **Isolated Dependencies** - No conflicts with local installations  
+✅ **Easy Cleanup** - Remove everything with one command  
+✅ **Production Ready** - Same containers can be used in production
 
 ## Getting Help
 
