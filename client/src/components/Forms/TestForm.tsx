@@ -98,8 +98,12 @@ export const TestForm: React.FC<TestFormProps> = ({
               placeholder="500" 
               className="w-full"
               min={1}
-              formatter={value => `₹ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-              parser={value => value!.replace(/₹\s?|(,*)/g, '')}
+              formatter={(value?: string | number) =>
+                `₹ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              }
+              parser={(value?: string) =>
+                value ? value.replace(/₹\s?|(,*)/g, '') : ''
+              }
             />
           </Form.Item>
 

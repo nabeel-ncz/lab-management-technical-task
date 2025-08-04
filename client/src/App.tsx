@@ -12,7 +12,7 @@ import { FilterBar } from './components/Filters/FilterBar';
 import { Investigation, KanbanColumn } from './types';
 import { InvestigationFormData, PatientFormData, DoctorFormData, TestFormData } from './schemas';
 import { StatCards } from './components/Cards/StatCards';
-import { api } from './api/mockApi';
+import { api } from './api';
 import dayjs from 'dayjs';
 
 const { Content, Sider } = Layout;

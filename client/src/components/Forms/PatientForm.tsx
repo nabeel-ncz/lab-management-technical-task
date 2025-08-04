@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Form, Input, Select, InputNumber, Button, Space } from 'antd';
+import { Modal, Form, Input, Select, InputNumber, Button } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { PatientFormData, PatientSchema } from '../../schemas';
 import { Patient } from '../../types';

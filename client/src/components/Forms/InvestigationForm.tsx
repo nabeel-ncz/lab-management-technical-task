@@ -3,7 +3,7 @@ import { Modal, Form, Select, Button, Typography, Card, Tag, Input } from 'antd'
 import { FileTextOutlined, UserOutlined, TeamOutlined, ExperimentOutlined } from '@ant-design/icons';
 import { InvestigationFormData, InvestigationSchema } from '../../schemas';
 import { Patient, Doctor, Test } from '../../types';
-import { api } from '../../api/mockApi';
+import { api } from '../../api';
 
 const { Text } = Typography;
 
