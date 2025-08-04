@@ -132,13 +132,6 @@ docker compose logs backend
 docker compose restart backend
 ```
 
-### Performance Tips
-
-1. **Allocate sufficient resources** to Docker (4GB+ RAM recommended)
-2. **Use .dockerignore** to exclude unnecessary files
-3. **Restart services** individually instead of the entire stack
-4. **Use volumes** for persistent data
-
 ## Useful Commands
 
 ### Basic Operations
@@ -234,24 +227,6 @@ AWS_SECRET_ACCESS_KEY=your_secret_key_here
 AWS_S3_BUCKET_NAME=lab-management-reports
 ```
 
-For production, set real AWS credentials as environment variables before running.
-
-## Production Deployment
-
-### Production Build
-
-For production environments, use the optimized production configuration:
-
-```bash
-# Set environment variables for production
-export AWS_ACCESS_KEY_ID=your_real_access_key
-export AWS_SECRET_ACCESS_KEY=your_real_secret_key
-export AWS_S3_BUCKET_NAME=your_bucket_name
-
-# Build and run production containers
-docker compose -f docker-compose.prod.yml up --build -d
-```
-
 ### Production vs Development
 
 | Feature | Development | Production |
@@ -261,15 +236,6 @@ docker compose -f docker-compose.prod.yml up --build -d
 | Security | ❌ Relaxed | ✅ Hardened |
 | File Serving | Dev Server | Static Server |
 | Dependencies | All (dev + prod) | Production only |
-
-## Benefits of Docker Setup
-
-✅ **Zero Configuration** - No need to install Node.js, MongoDB, or manage dependencies  
-✅ **Consistent Environment** - Same setup across all machines  
-✅ **Instant Setup** - One command to start everything  
-✅ **Isolated Dependencies** - No conflicts with local installations  
-✅ **Easy Cleanup** - Remove everything with one command  
-✅ **Production Ready** - Same containers can be used in production
 
 ## Getting Help
 
