@@ -34,6 +34,8 @@ export const InvestigationSchema = z.object({
   testIds: z.array(z.string()).min(1, 'At least one test is required'),
   priority: z.enum(['Emergency', 'Normal', 'High']),
   notes: z.string().optional(),
+  totalAmount: z.number().optional(),
+  order: z.number().optional()
 });
 
 export type PatientFormData = z.infer<typeof PatientSchema>;

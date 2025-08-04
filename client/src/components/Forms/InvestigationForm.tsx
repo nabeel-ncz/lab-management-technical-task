@@ -54,7 +54,11 @@ export const InvestigationForm: React.FC<InvestigationFormProps> = ({
   const handleSubmit = async (values: InvestigationFormData) => {
     try {
       InvestigationSchema.parse(values);
-      onSubmit(values);
+      onSubmit({
+        ...values,
+        totalAmount: calculateTotalAmount(),
+        order: 1
+      });
       form.resetFields();
       setSelectedTests([]);
     } catch (error) {
