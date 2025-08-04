@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Select, Upload, Button, Input, Space, Tag, Typography, Divider } from 'antd';
-import { UploadOutlined, UserOutlined, TeamOutlined, CalendarOutlined, FileTextOutlined } from '@ant-design/icons';
+import { Modal, Form, Select, Upload, Button, Input, Space, Tag, Typography, Divider, message, Progress, Dropdown } from 'antd';
+import { UploadOutlined, UserOutlined, TeamOutlined, CalendarOutlined, FileTextOutlined, DownloadOutlined, EyeOutlined, CloudUploadOutlined } from '@ant-design/icons';
 import { Investigation } from '../../types';
+import { apiService } from '../../services/apiService';
 import dayjs from 'dayjs';
 
 const { TextArea } = Input;
@@ -18,7 +19,6 @@ interface FormValues {
   status: 'Advised' | 'Billing' | 'New Investigations' | 'In Progress' | 'Under Review' | 'Approved' | 'Revision Required';
   priority: 'Emergency' | 'Normal' | 'High';
   notes: string;
-  reportFile: FileList | null;
 }
 
 export const InvestigationModal: React.FC<InvestigationModalProps> = ({
@@ -29,6 +29,9 @@ export const InvestigationModal: React.FC<InvestigationModalProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [currentReportFile, setCurrentReportFile] = useState<string | null>(null);
 
   useEffect(() => {
     if (investigation) {
@@ -37,6 +40,7 @@ export const InvestigationModal: React.FC<InvestigationModalProps> = ({
         priority: investigation.priority,
         notes: investigation.notes
       });
+      setCurrentReportFile(investigation.reportFile || null);
     }
   }, [investigation, form]);
 
@@ -49,14 +53,120 @@ export const InvestigationModal: React.FC<InvestigationModalProps> = ({
       await onUpdate(investigation.id, {
         status: values.status,
         priority: values.priority,
-        notes: values.notes,
-        reportFile: values?.reportFile?.[0]?.name
+        notes: values.notes
       });
+      message.success('Investigation updated successfully');
       onClose();
     } catch (error) {
       console.error('Error updating investigation:', error);
+      message.error('Failed to update investigation');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFileUpload = async (file: File) => {
+    if (!investigation) {
+      message.error('No investigation selected');
+      return false;
+    }
+
+    setUploading(true);
+    setUploadProgress(0);
+
+    try {
+      // Simulate upload progress
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 200);
+
+      const updatedInvestigation = await apiService.uploadInvestigationReport(investigation.id, file);
+
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+
+      // Update the current investigation data
+      setCurrentReportFile(updatedInvestigation.reportFile || null);
+
+      // Update parent component with new data
+      await onUpdate(investigation.id, { reportFile: updatedInvestigation.reportFile });
+
+      message.success('Report uploaded successfully');
+
+      // Reset progress after a short delay
+      setTimeout(() => {
+        setUploadProgress(0);
+      }, 1000);
+
+    } catch (error) {
+      console.error('Upload error:', error);
+      message.error('Failed to upload report');
+    } finally {
+      setUploading(false);
+    }
+
+    return false; // Prevent default upload behavior
+  };
+
+  const handleOpenDocument = () => {
+    if (currentReportFile) {
+      window.open(currentReportFile, '_blank');
+    }
+  };
+
+  const handleDownloadDocument = () => {
+    if (currentReportFile && investigation) {
+      const link = document.createElement('a');
+      link.href = currentReportFile;
+      link.download = `investigation-${investigation.id}-report`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const getFileMenuItems = () => [
+    {
+      key: 'reupload',
+      label: 'Re-upload',
+      icon: <CloudUploadOutlined />,
+      onClick: () => {
+        // Trigger file input click
+        const fileInput = document.querySelector('.report-upload input[type="file"]') as HTMLInputElement;
+        if (fileInput) {
+          fileInput.click();
+        }
+      }
+    },
+    {
+      key: 'open',
+      label: 'Open Document',
+      icon: <EyeOutlined />,
+      onClick: handleOpenDocument
+    },
+    {
+      key: 'download',
+      label: 'Download',
+      icon: <DownloadOutlined />,
+      onClick: handleDownloadDocument
+    }
+  ];
+
+  const getFileNameFromUrl = (url: string) => {
+    try {
+      const urlParts = url.split('/');
+      const fileName = urlParts[urlParts.length - 1];
+      // Remove timestamp prefix if present (format: timestamp-filename)
+      const cleanName = fileName.replace(/^\d+-/, '');
+      return cleanName || 'report-file';
+    } catch {
+      return 'report-file';
     }
   };
 
@@ -256,14 +366,55 @@ export const InvestigationModal: React.FC<InvestigationModalProps> = ({
                 <Select options={priorityOptions} placeholder="Select priority" />
               </Form.Item>
 
-              <Form.Item label="Upload Report" name="reportFile">
-                <Upload
-                  beforeUpload={() => false}
-                  maxCount={1}
-                  accept=".pdf,.doc,.docx,.txt"
-                >
-                  <Button icon={<UploadOutlined />}>Select File</Button>
-                </Upload>
+              <Form.Item label="Upload Report" className='col-span-3'>
+                <div className="space-y-3">
+                  {/* File Upload */}
+                  <Upload
+                    className="report-upload"
+                    beforeUpload={handleFileUpload}
+                    maxCount={1}
+                    accept=".pdf,.doc,.docx,.txt"
+                    showUploadList={false}
+                    disabled={uploading}
+                  >
+                    <Button
+                      icon={<UploadOutlined />}
+                      loading={uploading}
+                      disabled={uploading}
+                    >
+                      {uploading ? 'Uploading...' : currentReportFile ? 'Replace Report' : 'Upload Report'}
+                    </Button>
+                  </Upload>
+
+                  {/* Upload Progress */}
+                  {uploading && uploadProgress > 0 && (
+                    <div className="w-full">
+                      <Progress percent={uploadProgress} size="small" />
+                    </div>
+                  )}
+
+                  {/* Current Report File */}
+                  {currentReportFile && !uploading && (
+                    <div className="flex items-center justify-between p-2 bg-green-50 border border-green-200 rounded">
+                      <div className="flex items-center space-x-2">
+                        <FileTextOutlined className="text-green-600" />
+                        <div>
+                          <Text className="text-sm text-green-800 font-medium">Report uploaded</Text>
+                          <div className="text-xs text-green-600">{getFileNameFromUrl(currentReportFile)}</div>
+                        </div>
+                      </div>
+                      <Dropdown
+                        menu={{ items: getFileMenuItems() }}
+                        trigger={['click']}
+                        placement="bottomRight"
+                      >
+                        <Button size="small" type="link">
+                          Manage File
+                        </Button>
+                      </Dropdown>
+                    </div>
+                  )}
+                </div>
               </Form.Item>
             </div>
 
