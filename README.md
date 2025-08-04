@@ -60,7 +60,7 @@ A full-stack laboratory management system with React frontend and Node.js backen
 
 ## Running the Application
 
-1. **Start MongoDB** (make sure it's running on localhost:27017)
+1. **Start MongoDB**
 
 2. **Start the backend**
    ```bash

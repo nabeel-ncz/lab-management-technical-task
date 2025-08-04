@@ -41,13 +41,6 @@ The Docker setup automatically starts:
 
 All services are networked together and configured with the correct environment variables.
 
-## Development Features
-
-- **Hot Reload**: Code changes automatically update the running application
-- **Volume Mounting**: Your local code is mounted into containers
-- **Persistent Database**: Data survives container restarts
-- **Service Dependencies**: Proper startup order (MongoDB → Backend → Frontend)
-
 ## Useful Commands
 
 ### Basic Operations
@@ -109,78 +102,6 @@ docker system prune
 docker image prune -a
 ```
 
-## Production Deployment
-
-### Production Build
-
-For production environments, use the optimized production configuration:
-
-```bash
-# Set environment variables for production
-export AWS_ACCESS_KEY_ID=your_real_access_key
-export AWS_SECRET_ACCESS_KEY=your_real_secret_key
-export AWS_S3_BUCKET_NAME=your_bucket_name
-
-# Build and run production containers
-docker compose -f docker-compose.prod.yml up --build -d
-```
-
-### Production vs Development
-
-| Feature | Development | Production |
-|---------|-------------|------------|
-| Hot Reload | ✅ Enabled | ❌ Disabled |
-| Build Optimization | ❌ Basic | ✅ Optimized |
-| Security | ❌ Relaxed | ✅ Hardened |
-| File Serving | Dev Server | Static Server |
-| Dependencies | All (dev + prod) | Production only |
-
-## Troubleshooting
-
-### Common Issues
-
-**Port conflicts:**
-```bash
-# If ports 3000 or 5173 are in use
-docker compose down
-# Kill processes using the ports, then
-docker compose up
-```
-
-**Database connection issues:**
-```bash
-# Check if MongoDB is running
-docker compose ps
-
-# Restart MongoDB
-docker compose restart mongodb
-
-# Check MongoDB logs
-docker compose logs mongodb
-```
-
-**Frontend not updating:**
-```bash
-# Rebuild frontend container
-docker compose up --build frontend
-```
-
-**Backend API errors:**
-```bash
-# Check backend logs
-docker compose logs backend
-
-# Restart backend
-docker compose restart backend
-```
-
-### Performance Tips
-
-1. **Allocate sufficient resources** to Docker (4GB+ RAM recommended)
-2. **Use .dockerignore** to exclude unnecessary files
-3. **Restart services** individually instead of the entire stack
-4. **Use volumes** for persistent data
-
 ## File Structure
 
 ```
@@ -216,15 +137,6 @@ AWS_S3_BUCKET_NAME=lab-management-reports
 ```
 
 For production, set real AWS credentials as environment variables before running.
-
-## Benefits of Docker Setup
-
-✅ **Zero Configuration** - No need to install Node.js, MongoDB, or manage dependencies  
-✅ **Consistent Environment** - Same setup across all machines  
-✅ **Instant Setup** - One command to start everything  
-✅ **Isolated Dependencies** - No conflicts with local installations  
-✅ **Easy Cleanup** - Remove everything with one command  
-✅ **Production Ready** - Same containers can be used in production  
 
 ## Getting Help
 
