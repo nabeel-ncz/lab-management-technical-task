@@ -67,7 +67,7 @@ export const InvestigationCard: React.FC<InvestigationCardProps> = ({ investigat
       <div className="flex flex-col h-full space-y-4">
         {/* Header with ID and Priority */}
         <div className="flex items-center justify-between">
-          <Text className="font-bold text-gray-900 text-sm">{investigation.id}</Text>
+          <Text className="font-bold text-gray-900 text-sm">MRN{investigation.id?.slice(-6)?.toUpperCase()}</Text>
           <Tag 
             color={getPriorityTagColor(investigation.priority)} 
             className="px-3 py-1 text-xs font-medium rounded-lg"
